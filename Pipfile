@@ -1,0 +1,16 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[[source]]
+url = "https://pypi2.abm-jsc.ru"
+verify_ssl = true
+name = "abm_pypi"
+
+[packages]
+
+[dev-packages]
+
+[requires]
+python_version = "3.11"
