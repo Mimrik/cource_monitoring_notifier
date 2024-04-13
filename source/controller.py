@@ -6,6 +6,15 @@ from typing import NoReturn
 logger = logging.getLogger(__name__)
 
 
+@dataclass
+class MonitoringEvent:
+    external_id: str
+    trigger_external_id: str
+    opdata: str
+    occurred_at: int
+    resolved_at: int | None = None
+
+
 class Controller:
     @dataclass
     class Config:

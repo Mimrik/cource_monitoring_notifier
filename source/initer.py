@@ -9,6 +9,7 @@ from sqlalchemy_tools.database_connector.database_connector import DatabaseConne
 from sqlalchemy_tools.database_connector.database_session_maker import DatabaseSessionMaker
 
 from controller import Controller
+from monitoring_systems.zabbix_controller import ZabbixController
 from outer_resources.database_gateway import DatabaseGateway
 from outer_resources.zabbix_connector import ZabbixConnector
 
@@ -21,6 +22,7 @@ class Initer:
     class Config:
         logging: init_helpers.LogsConfig
         database_connector: DatabaseConnector.Config
+        zabbix_controller: ZabbixController.Config
         zabbix_connector: ZabbixConnector.Config
 
     config: Config
@@ -31,6 +33,7 @@ class Initer:
         database_connector: DatabaseConnector = None
         database_gateway: DatabaseGateway = None
         database_session_maker: DatabaseSessionMaker = None
+        zabbix_controller: ZabbixController = None
         zabbix_connector: ZabbixConnector = None
         controller: Controller = None
 
@@ -63,6 +66,7 @@ class Initer:
 
     def _init_zabbix_components(self) -> None:
         self.context.zabbix_connector = ZabbixConnector(self.config.zabbix_connector, self.context)
+        self.context.zabbix_controller = ZabbixController(self.config.zabbix_controller, self.context)
 
     async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
         await self.context.async_deinit()
