@@ -14,6 +14,7 @@ python = "^3.11"
 init-helpers-abm={version="1.2.59931", source="abm_pypi"}
 async-tools-abm={version="2.1.57881", source="abm_pypi"}
 sqlalchemy-tools-abm={version="2.0.58719", source="abm_pypi"}
+http-tools-abm={version="5.3.59932", source="abm_pypi"}
 
 [build-system]
 requires = ["poetry-core"]
