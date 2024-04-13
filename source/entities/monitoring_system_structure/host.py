@@ -9,9 +9,7 @@ from utils.timestamp_converters import CURRENT_TIMESTAMP_SEC_SQL_CLAUSE, get_cur
 class Host:
     __tablename__ = "host"
 
-    id: Mapped[int] = mapped_column(primary_key=True, init=False)
-    external_id: Mapped[str] = mapped_column(nullable=False)
-    ip_address: Mapped[str] = mapped_column(nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True, init=True)
     title: Mapped[str] = mapped_column(nullable=False)
     disabled_at: Mapped[int] = mapped_column(nullable=True, default=None)
 

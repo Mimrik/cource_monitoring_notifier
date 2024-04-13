@@ -13,7 +13,6 @@ class Trigger:
     __tablename__ = "trigger"
 
     id: Mapped[int] = mapped_column(primary_key=True, init=True)
-    external_id: Mapped[str] = mapped_column(nullable=False)
     title: Mapped[str] = mapped_column(nullable=False)
     severity: Mapped[int] = mapped_column(nullable=False)
     host_id: Mapped[int] = mapped_column(RestrictForeignKey(Host.id), nullable=False)
@@ -24,6 +23,3 @@ class Trigger:
         server_default=CURRENT_TIMESTAMP_SEC_SQL_CLAUSE,
         nullable=False,
     )
-
-
-UniqueConstraint(Trigger.external_id, Trigger.host_id)
