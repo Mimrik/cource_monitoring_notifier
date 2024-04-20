@@ -4,9 +4,6 @@ from typing import Any
 
 from aiohttp.web_exceptions import HTTPBadRequest
 from http_tools.http_server_connector import HttpServerConnector
-from init_helpers.dict_to_dataclass import dict_to_dataclass
-
-from entities.monitoring_system_structure.host_group import HostGroup
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +26,7 @@ class ZabbixTrigger:
     triggerid: str
     description: str
     priority: int
-    host_ids: set[int]
+    host_id: int
 
 
 @dataclass(frozen=True)
@@ -125,7 +122,7 @@ class ZabbixConnector:
                     triggerid=host_info["triggerid"],
                     description=host_info["description"],
                     priority=host_info["priority"],
-                    host_ids={group["hostid"] for group in host_info["hosts"]}
+                    host_id=host_info["hosts"][0]["hostid"],
                 )
             )
         return zabbix_triggers
