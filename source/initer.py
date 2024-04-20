@@ -24,12 +24,13 @@ class Initer:
         database_connector: DatabaseConnector.Config
         zabbix_controller: ZabbixController.Config
         zabbix_connector: ZabbixConnector.Config
+        controller: Controller.Config
 
     config: Config
 
     @dataclass
     class Context(AsyncInitable, AsyncDeinitable):
-        client_session: ClientSession = None
+        session: ClientSession = None
         database_connector: DatabaseConnector = None
         database_gateway: DatabaseGateway = None
         database_session_maker: DatabaseSessionMaker = None
@@ -51,10 +52,10 @@ class Initer:
 
     async def __aenter__(self) -> Controller:
         self._init_database_components()
-        self.context.client_session = ClientSession()
+        self.context.session = ClientSession()
         self._init_zabbix_components()
 
-        self.context.controller = Controller(self.context)
+        self.context.controller = Controller(self.config.controller, self.context)
 
         await self.context.async_init()
         return self.context.controller
