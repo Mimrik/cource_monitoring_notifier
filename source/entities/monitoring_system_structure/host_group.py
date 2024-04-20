@@ -1,4 +1,3 @@
-from sqlalchemy import UniqueConstraint
 from sqlalchemy.orm import mapped_column, Mapped
 
 from sqlalchemy_tools.entity_helpers.sqlalchemy_base import sqlalchemy_mapper_registry
@@ -19,6 +18,3 @@ class HostGroup:
         server_default=CURRENT_TIMESTAMP_SEC_SQL_CLAUSE,
         nullable=False,
     )
-
-
-UniqueConstraint(HostGroup.external_id, HostGroup.monitoring_system_id)
