@@ -56,8 +56,8 @@ class ZabbixController(AbstractMonitoringSystemController, AsyncInitable):
             Trigger(
                 id=int(trigger.triggerid),
                 title=trigger.description,
-                severity=trigger.priority,
-                host_id=trigger.host_id
+                severity=int(trigger.priority),
+                host_id=int(trigger.host_id)
             )
             for trigger in zabbix_triggers
         ]

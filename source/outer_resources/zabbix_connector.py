@@ -18,7 +18,7 @@ class ZabbixHostGroup:
 class ZabbixHost:
     hostid: int
     name: str
-    group_ids: set[int]
+    group_ids: frozenset[int]
 
 
 @dataclass(frozen=True)
@@ -94,7 +94,7 @@ class ZabbixConnector:
                 ZabbixHost(
                     hostid=host_info["hostid"],
                     name=host_info["name"],
-                    group_ids={group["groupid"] for group in host_info["groups"]}
+                    group_ids=frozenset({group["groupid"] for group in host_info["groups"]})
                 )
             )
         return zabbix_hosts

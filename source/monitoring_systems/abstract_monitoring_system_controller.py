@@ -15,7 +15,7 @@ class AbstractMonitoringSystemController(abc.ABC):
         pass
 
     @abc.abstractmethod
-    async def get_host_group_id_to_hosts(self) -> dict[str, list[Host]]:
+    async def get_host_group_id_to_hosts(self) -> dict[int, list[Host]]:
         pass
 
     @abc.abstractmethod

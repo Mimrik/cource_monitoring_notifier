@@ -14,12 +14,12 @@ class HostToHostGroup:
 
     host_id: Mapped[int] = mapped_column(
         RestrictForeignKey(Host.id),
-        composite_primary_key=True,
+        primary_key=True,
         nullable=False
     )
     host_group_id: Mapped[int] = mapped_column(
         RestrictForeignKey(HostGroup.id),
-        composite_primary_key=True,
+        primary_key=True,
         nullable=False
     )
 
