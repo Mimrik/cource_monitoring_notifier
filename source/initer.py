@@ -12,6 +12,8 @@ from controller import Controller
 from database_actualizer import DatabaseActualizer
 from monitoring_systems.abstract_monitoring_system_controller import AbstractMonitoringSystemController
 from monitoring_systems.zabbix_controller import ZabbixController
+from notifiers.telegram_bot import TelegramBot
+from notifiers.telegram_dispatcher import TelegramDispatcher
 from outer_resources.database_gateway import DatabaseGateway
 from outer_resources.zabbix_connector import ZabbixConnector
 
@@ -27,6 +29,7 @@ class Initer:
         zabbix_controller: ZabbixController.Config
         zabbix_connector: ZabbixConnector.Config
         database_actualizer: DatabaseActualizer.Config
+        telegram_bot: TelegramBot.Config = None
 
     config: Config
 
@@ -40,6 +43,8 @@ class Initer:
         zabbix_controller: ZabbixController = None
         monitoring_system_controller: AbstractMonitoringSystemController = None
         zabbix_connector: ZabbixConnector = None
+        telegram_bot: TelegramBot = None
+        telegram_dispatcher: TelegramDispatcher = None
         controller: Controller = None
 
         def __post_init__(self):
@@ -56,8 +61,8 @@ class Initer:
 
     async def __aenter__(self) -> Controller:
         self._init_database_components()
-        self.context.session = ClientSession()
         self._init_zabbix_components()
+        self._init_telegram_components()
 
         self.context.controller = Controller(self.context)
 
@@ -75,6 +80,12 @@ class Initer:
         self.context.zabbix_connector = ZabbixConnector(self.config.zabbix_connector, self.context)
         self.context.zabbix_controller = ZabbixController(self.config.zabbix_controller, self.context)
 
+    def _init_telegram_components(self) -> None:
+        self.context.telegram_bot = TelegramBot(self.config.telegram_bot)
+        self.context.telegram_dispatcher = TelegramDispatcher(self.context)
+
     async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
+        if self.context.session is not None:
+            await self.context.session.close()
         await self.context.async_deinit()
         logger.info(f"----===== Deinit done ====----")

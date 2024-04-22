@@ -11,6 +11,7 @@ source = [
 
 [tool.poetry.dependencies]
 python = "^3.11"
+aiogram = "^2"
 init-helpers-abm={version="1.2.59931", source="abm_pypi"}
 async-tools-abm={version="2.1.57881", source="abm_pypi"}
 sqlalchemy-tools-abm={version="2.0.58719", source="abm_pypi"}
