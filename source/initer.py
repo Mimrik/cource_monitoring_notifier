@@ -9,6 +9,8 @@ from sqlalchemy_tools.database_connector.database_connector import DatabaseConne
 from sqlalchemy_tools.database_connector.database_session_maker import DatabaseSessionMaker
 
 from controller import Controller
+from database_actualizer import DatabaseActualizer
+from monitoring_systems.abstract_monitoring_system_controller import AbstractMonitoringSystemController
 from monitoring_systems.zabbix_controller import ZabbixController
 from outer_resources.database_gateway import DatabaseGateway
 from outer_resources.zabbix_connector import ZabbixConnector
@@ -24,7 +26,7 @@ class Initer:
         database_connector: DatabaseConnector.Config
         zabbix_controller: ZabbixController.Config
         zabbix_connector: ZabbixConnector.Config
-        controller: Controller.Config
+        database_actualizer: DatabaseActualizer.Config
 
     config: Config
 
@@ -34,7 +36,9 @@ class Initer:
         database_connector: DatabaseConnector = None
         database_gateway: DatabaseGateway = None
         database_session_maker: DatabaseSessionMaker = None
+        database_actualizer: DatabaseActualizer = None
         zabbix_controller: ZabbixController = None
+        monitoring_system_controller: AbstractMonitoringSystemController = None
         zabbix_connector: ZabbixConnector = None
         controller: Controller = None
 
@@ -55,8 +59,9 @@ class Initer:
         self.context.session = ClientSession()
         self._init_zabbix_components()
 
-        self.context.controller = Controller(self.config.controller, self.context)
+        self.context.controller = Controller(self.context)
 
+        self.context.monitoring_system_controller = self.context.zabbix_controller
         await self.context.async_init()
         return self.context.controller
 
@@ -64,6 +69,7 @@ class Initer:
         self.context.database_connector = DatabaseConnector(self.config.database_connector)
         self.context.database_session_maker = DatabaseSessionMaker(self.context)
         self.context.database_gateway = DatabaseGateway(self.context)
+        self.context.database_actualizer = DatabaseActualizer(self.config.database_actualizer, self.context)
 
     def _init_zabbix_components(self) -> None:
         self.context.zabbix_connector = ZabbixConnector(self.config.zabbix_connector, self.context)
