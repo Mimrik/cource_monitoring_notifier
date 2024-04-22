@@ -50,7 +50,7 @@ class ZabbixConnector:
         self.config = config
         self.context = context
         self._http_connector = HttpServerConnector(config, context)
-        self.PATH = "/zabbix/api_jsonrpc.php"
+        self._PATH = "/zabbix/api_jsonrpc.php"
         logger.info(f"{type(self).__name__} inited")
 
     async def get_host_groups(self) -> list[ZabbixHostGroup]:
@@ -65,7 +65,7 @@ class ZabbixConnector:
             "id": 1,
         }
 
-        answer = await self._http_connector.post_json(path=self.PATH, payload=payload)
+        answer = await self._http_connector.post_json(path=self._PATH, payload=payload)
 
         host_group_external_id_to_host_group = {}
         for host_info in self._parse_answer(answer):
@@ -86,7 +86,7 @@ class ZabbixConnector:
             "id": 1,
         }
 
-        answer = await self._http_connector.post_json(self.PATH, payload=payload)
+        answer = await self._http_connector.post_json(self._PATH, payload=payload)
 
         zabbix_hosts = set()
         for host_info in self._parse_answer(answer):
@@ -113,7 +113,7 @@ class ZabbixConnector:
             "id": 1,
         }
 
-        answer = await self._http_connector.post_json(self.PATH, payload=payload)
+        answer = await self._http_connector.post_json(self._PATH, payload=payload)
 
         zabbix_triggers = set()
         for host_info in self._parse_answer(answer):
@@ -138,7 +138,7 @@ class ZabbixConnector:
             "id": 1,
         }
 
-        answer = await self._http_connector.post_json(path=self.PATH, payload=payload)
+        answer = await self._http_connector.post_json(path=self._PATH, payload=payload)
 
         problems = set()
         for problem_info in self._parse_answer(answer):
