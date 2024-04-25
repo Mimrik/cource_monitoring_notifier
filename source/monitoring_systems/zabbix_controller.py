@@ -8,9 +8,9 @@ from async_tools import AsyncInitable
 from entities.monitoring_system_structure.host import Host
 from entities.monitoring_system_structure.host_group import HostGroup
 from entities.monitoring_system_structure.trigger import Trigger
-from monitoring_systems.abstract_monitoring_system_controller import AbstractMonitoringSystemController
+from monitoring_systems.abstract_monitoring_system_controller import AbstractMonitoringSystemController, MonitoringEvent
 from outer_resources.zabbix_connector import ZabbixConnector, ZabbixProblem
-from controller import Controller, MonitoringEvent
+from controller import Controller
 from utils.timestamp_converters import get_current_time_sec
 
 logger = logging.getLogger(__name__)
@@ -62,6 +62,21 @@ class ZabbixController(AbstractMonitoringSystemController, AsyncInitable):
             for trigger in zabbix_triggers
         ]
 
+    async def get_unresolved_events(self) -> list[MonitoringEvent]:
+        current_cycle_problems = await self.context.zabbix_connector.get_problems()
+        events = []
+        for problem in current_cycle_problems:
+            events.append(
+                MonitoringEvent(
+                    external_id=problem.external_id,
+                    trigger_id=int(problem.trigger_external_id),
+                    opdata=problem.opdata,
+                    occurred_at=int(problem.occurred_at),
+                    resolved_at=get_current_time_sec()
+                )
+            )
+        return events
+
     async def _async_init(self) -> None:
         asyncio.create_task(self._collect_monitoring_events())
 
@@ -83,9 +98,9 @@ class ZabbixController(AbstractMonitoringSystemController, AsyncInitable):
                     events.append(
                         MonitoringEvent(
                             external_id=problem.external_id,
-                            trigger_external_id=problem.trigger_external_id,
+                            trigger_id=int(problem.trigger_external_id),
                             opdata=problem.opdata,
-                            occurred_at=problem.occurred_at,
+                            occurred_at=int(problem.occurred_at),
                         )
                     )
 
@@ -96,9 +111,9 @@ class ZabbixController(AbstractMonitoringSystemController, AsyncInitable):
                     events.append(
                         MonitoringEvent(
                             external_id=problem.external_id,
-                            trigger_external_id=problem.trigger_external_id,
+                            trigger_id=int(problem.trigger_external_id),
                             opdata=problem.opdata,
-                            occurred_at=problem.occurred_at,
+                            occurred_at=int(problem.occurred_at),
                             resolved_at=get_current_time_sec()
                         )
                     )
