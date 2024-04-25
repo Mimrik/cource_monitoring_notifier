@@ -431,7 +431,6 @@ class TelegramController(AbstractNotifierController, AsyncInitable):
             message_id=callback_query.message.message_id,
             text=self.context.telegram_renderer.render_subscription_clarifying_question("Zabbix"),
             reply_markup=self.context.telegram_keyboard_creator.create_full_subscription_keyboard(
-                monitoring_system_id=button_data.entity_id,
                 start_message_id=button_data.start_message_id,
             )
         )
@@ -443,7 +442,6 @@ class TelegramController(AbstractNotifierController, AsyncInitable):
             message_id=callback_query.message.message_id,
             text=self.context.telegram_renderer.render_unsubscription_clarifying_question("Zabbix"),
             reply_markup=self.context.telegram_keyboard_creator.create_full_unsubscription_keyboard(
-                monitoring_system_id=button_data.entity_id,
                 start_message_id=button_data.start_message_id,
             )
         )
