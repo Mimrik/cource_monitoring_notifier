@@ -21,3 +21,14 @@ class TelegramBot(Bot):
             proxy=config.proxy,
         )
         logger.info(f"{type(self).__name__} inited")
+
+    async def check_is_bot_administrator(self, chat_id: int) -> bool:
+        if chat_id > 0:
+            return True
+
+        chat_administrators = await self.get_chat_administrators(chat_id=chat_id)
+        for administrator in chat_administrators:
+            if administrator.user.id == (await self.get_me()).id:
+                return True
+
+        return False

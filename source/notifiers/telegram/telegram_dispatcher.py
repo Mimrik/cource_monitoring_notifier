@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from aiogram import Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
-from notifiers.telegram_bot import TelegramBot
+from notifiers.telegram.telegram_bot import TelegramBot
 
 logger = logging.getLogger(__name__)
 
