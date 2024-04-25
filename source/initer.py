@@ -12,8 +12,8 @@ from controller import Controller
 from database_actualizer import DatabaseActualizer
 from monitoring_systems.abstract_monitoring_system_controller import AbstractMonitoringSystemController
 from monitoring_systems.zabbix_controller import ZabbixController
-from notifiers.telegram_bot import TelegramBot
-from notifiers.telegram_dispatcher import TelegramDispatcher
+from notifiers.telegram.telegram_bot import TelegramBot
+from notifiers.telegram.telegram_dispatcher import TelegramDispatcher
 from outer_resources.database_gateway import DatabaseGateway
 from outer_resources.zabbix_connector import ZabbixConnector
 
