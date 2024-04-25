@@ -12,8 +12,12 @@ from controller import Controller
 from database_actualizer import DatabaseActualizer
 from monitoring_systems.abstract_monitoring_system_controller import AbstractMonitoringSystemController
 from monitoring_systems.zabbix_controller import ZabbixController
+from notifiers.abstract_notifier_controller import AbstractNotifierController
 from notifiers.telegram.telegram_bot import TelegramBot
+from notifiers.telegram.telegram_controller import TelegramController
 from notifiers.telegram.telegram_dispatcher import TelegramDispatcher
+from notifiers.telegram.telegram_keyboard_creator import TelegramKeyboardCreator
+from notifiers.telegram.telegram_renderer import TelegramRenderer
 from outer_resources.database_gateway import DatabaseGateway
 from outer_resources.zabbix_connector import ZabbixConnector
 
@@ -45,6 +49,11 @@ class Initer:
         zabbix_connector: ZabbixConnector = None
         telegram_bot: TelegramBot = None
         telegram_dispatcher: TelegramDispatcher = None
+        telegram_controller: TelegramController = None
+        telegram_renderer: TelegramRenderer = None
+        telegram_keyboard_creator: TelegramKeyboardCreator = None
+        notifier_controller: AbstractNotifierController = None
+
         controller: Controller = None
 
         def __post_init__(self):
@@ -67,6 +76,7 @@ class Initer:
         self.context.controller = Controller(self.context)
 
         self.context.monitoring_system_controller = self.context.zabbix_controller
+        self.context.notifier_controller = self.context.telegram_controller
         await self.context.async_init()
         return self.context.controller
 
@@ -83,6 +93,9 @@ class Initer:
     def _init_telegram_components(self) -> None:
         self.context.telegram_bot = TelegramBot(self.config.telegram_bot)
         self.context.telegram_dispatcher = TelegramDispatcher(self.context)
+        self.context.telegram_controller = TelegramController(self.context)
+        self.context.telegram_renderer = TelegramRenderer()
+        self.context.telegram_keyboard_creator = TelegramKeyboardCreator(self.context)
 
     async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
         if self.context.session is not None:
