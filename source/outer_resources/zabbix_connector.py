@@ -25,8 +25,8 @@ class ZabbixHost:
 class ZabbixTrigger:
     triggerid: str
     description: str
-    priority: int
-    host_id: int
+    priority: str
+    host_id: str
 
 
 @dataclass(frozen=True)
@@ -35,8 +35,8 @@ class ZabbixProblem:
     trigger_external_id: str
     trigger_title: str
     opdata: str
-    occurred_at: int
-    trigger_severity: int
+    occurred_at: str
+    trigger_severity: str
 
 
 class ZabbixConnector:
@@ -151,7 +151,6 @@ class ZabbixConnector:
                 trigger_severity=problem_info["severity"],
             )
             problems.add(problem)
-
         return problems
 
     @staticmethod
