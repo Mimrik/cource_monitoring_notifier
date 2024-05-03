@@ -29,24 +29,24 @@ TELEGRAM_COMMAND_TO_DESCRIPTION: dict[TelegramCommand, str] = {
 }
 
 TELEGRAM_HELP_MESSAGE = text(
-    f"Emoji to problem severity:\n",
-    f"ℹ - info\n",
-    f"😐 - warning\n",
-    f"🔥 - average\n",
-    f"👹 - high\n",
-    f"💀 - disaster\n",
-    f"✅ - problem resolved.\n",
-    f"\n",
-    f"You can mute problem messages.\n",
-    f"In this case, you won't know about problem resolved.\n\n",
-    f"Commands:\n",
+    "Emoji to problem severity:\n",
+    "ℹ - info\n",
+    "😐 - warning\n",
+    "🔥 - average\n",
+    "👹 - high\n",
+    "💀 - disaster\n",
+    "✅ - problem resolved.\n",
+    "\n",
+    "You can mute problem messages.\n",
+    "In this case, you won't know about problem resolved.\n\n",
+    "Commands:\n",
     f"/{TelegramCommand.GET_CURRENT_PROBLEMS} - "
     f"{TELEGRAM_COMMAND_TO_DESCRIPTION[TelegramCommand.GET_CURRENT_PROBLEMS]}\n",
     f"/{TelegramCommand.SUBSCRIPTION_SETTINGS} - "
     f"{TELEGRAM_COMMAND_TO_DESCRIPTION[TelegramCommand.SUBSCRIPTION_SETTINGS]}\n",
     f"/{TelegramCommand.TIME_ZONE_SETTING} - "
     f"{TELEGRAM_COMMAND_TO_DESCRIPTION[TelegramCommand.TIME_ZONE_SETTING]}\n",
-    bold(f"I need to be promoted to admin to perform all this functionality")
+    bold("I need to be promoted to admin to perform all this functionality")
 )
 
 
@@ -89,14 +89,8 @@ class TelegramRenderer:
         message = f"{emoji} {caption}\n{timing_answer}\n{event_origin}\n"
         if event_message_components.event.opdata:
             message += f"{SpecialSymbol.SECTION} Description: {event_message_components.event.opdata}\n"
-        message = message.replace("_", "\_")
+        message = message.replace("_", "\\_")
         return message
-
-    def render_dashboard_event(self, event_message_components: EventMessageComponents) -> str:
-        emoji = self._severity_id_to_emoji[event_message_components.trigger.severity]
-        return f"{emoji} Zabbix / " \
-               f"{HOST_GROUP_COMBINER.join([host_group.title for host_group in event_message_components.host_groups])} / " \
-               f"{event_message_components.host.title} / {event_message_components.trigger.title}"
 
     @staticmethod
     def render_subscription_clarifying_question(monitoring_system_title: str):

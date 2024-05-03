@@ -101,4 +101,4 @@ class Initer:
         if self.context.session is not None:
             await self.context.session.close()
         await self.context.async_deinit()
-        logger.info(f"----===== Deinit done ====----")
+        logger.info("----===== Deinit done ====----")

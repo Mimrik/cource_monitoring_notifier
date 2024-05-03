@@ -1,4 +1,3 @@
-from sqlalchemy import UniqueConstraint
 from sqlalchemy.orm import mapped_column, Mapped
 
 from sqlalchemy_tools.entity_helpers.fk_keys import RestrictForeignKey
@@ -13,7 +12,9 @@ from utils.timestamp_converters import CURRENT_TIMESTAMP_SEC_SQL_CLAUSE, get_cur
 class NotificationSinkToTrigger:
     __tablename__ = "notification_sink_to_trigger"
 
-    notification_sink_id: Mapped[int] = mapped_column(RestrictForeignKey(NotificationSink.id), primary_key=True, nullable=False)
+    notification_sink_id: Mapped[int] = mapped_column(
+        RestrictForeignKey(NotificationSink.id), primary_key=True, nullable=False
+    )
     trigger_id: Mapped[int] = mapped_column(RestrictForeignKey(Trigger.id), primary_key=True, nullable=False)
 
     created_at: Mapped[int] = mapped_column(

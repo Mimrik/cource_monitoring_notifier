@@ -347,7 +347,7 @@ class TelegramController(AbstractNotifierController, AsyncInitable):
                 time_zone_code,
             )
             answer += f"{event_message}\n"
-        answer = answer.replace("_", "\_")
+        answer = answer.replace("_", "\\_")
         return answer
 
     async def _send_current_problems_answer(self, chat_id: str, answer: str) -> None:
@@ -459,7 +459,7 @@ class TelegramController(AbstractNotifierController, AsyncInitable):
         await self.context.controller.unsubscribe_to_monitoring_system_triggers(recipient_id)
         await self.context.telegram_bot.send_message(
             chat_id=recipient_id,
-            text=f"unsubscribed from all Zabbix triggers",
+            text="unsubscribed from all Zabbix triggers",
         )
 
     # delete:

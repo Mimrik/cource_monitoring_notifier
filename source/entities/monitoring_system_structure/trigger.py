@@ -1,4 +1,3 @@
-from sqlalchemy import UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from sqlalchemy_tools.entity_helpers.fk_keys import RestrictForeignKey

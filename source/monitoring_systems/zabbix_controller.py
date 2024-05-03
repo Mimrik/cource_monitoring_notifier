@@ -81,7 +81,7 @@ class ZabbixController(AbstractMonitoringSystemController, AsyncInitable):
         asyncio.create_task(self._collect_monitoring_events())
 
     async def _collect_monitoring_events(self) -> None:
-        logger.debug(f"Collecting monitoring events started")
+        logger.debug("Collecting monitoring events started")
         events: list[MonitoringEvent] = []
         current_cycle_problems = await self.context.zabbix_connector.get_problems()
         previous_cycle_problems = current_cycle_problems

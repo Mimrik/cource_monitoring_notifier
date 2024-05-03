@@ -488,9 +488,10 @@ class TelegramKeyboardCreator:
     @staticmethod
     def _cast_ip_address_value(ip_address: str) -> int:
         unformed_left_values = list(map(int, ip_address.split(":")[0].split(".")))
-        res = unformed_left_values[0] * 256 ** 3 + unformed_left_values[1] * 256 ** 2 + \
-              unformed_left_values[2] * 256 ** 1 + unformed_left_values[3]
-        return res
+        first = unformed_left_values[0] * 256 ** 3
+        second = unformed_left_values[1] * 256 ** 2
+        third = unformed_left_values[2] * 256 ** 1 + unformed_left_values[3]
+        return first + second + third
 
     @staticmethod
     def _is_str_ip_address(string_to_check: str) -> bool:

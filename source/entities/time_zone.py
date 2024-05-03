@@ -1,5 +1,3 @@
-from sqlalchemy import String, Integer
-
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy_tools.entity_helpers.setter import set_ids
 from sqlalchemy_tools.entity_helpers.sqlalchemy_base import sqlalchemy_mapper_registry, register_initial_values
