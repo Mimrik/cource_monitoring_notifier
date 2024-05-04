@@ -1,3 +1,4 @@
+"""TelegramController module."""
 import asyncio
 import logging
 from dataclasses import dataclass
@@ -28,6 +29,8 @@ logger = logging.getLogger(__name__)
 
 
 class TelegramCommand(StrEnum):
+    """TelegramCommand."""
+
     START = "start"
     HELP = "help"
     GET_CURRENT_PROBLEMS = "currentproblems"
@@ -36,8 +39,12 @@ class TelegramCommand(StrEnum):
 
 
 class TelegramController(AbstractNotifierController, AsyncInitable):
+    """Class with main telegram bot logic (commands and buttons)."""
+
     @dataclass
     class Context:
+        """context."""
+
         controller: Controller
         telegram_dispatcher: TelegramDispatcher
         database_gateway: DatabaseGateway
@@ -48,6 +55,7 @@ class TelegramController(AbstractNotifierController, AsyncInitable):
     MAX_MESSAGE_LENGTH = 4096
 
     def __init__(self, context: Context) -> None:
+        """init."""
         AsyncInitable.__init__(self)
         self.title = "Telegram"
         self.context = context
@@ -86,12 +94,10 @@ class TelegramController(AbstractNotifierController, AsyncInitable):
         self.context.telegram_dispatcher.register_message_handler(
             self._handle_new_chat_members, content_types=['new_chat_members']
         )
-        self.context.telegram_dispatcher.register_message_handler(
-            self._handle_kicked_from_chat, content_types=['left_chat_member']
-        )
         logger.info(f"{type(self).__name__} inited")
 
     async def _async_init(self) -> None:
+        """Set default bot commands in chat on application start."""
         await self._set_default_commands()
 
     async def notify_event_raised(
@@ -99,6 +105,7 @@ class TelegramController(AbstractNotifierController, AsyncInitable):
             notification_sink: NotificationSink,
             event_message_components: EventMessageComponents,
     ) -> None:
+        """Cast and send end message about raised event."""
         time_zone = await self.context.database_gateway.get_notification_sink_time_zone(notification_sink.id)
         message_text = await self.context.telegram_renderer.render_event_message_text(
             event_message_components, time_zone.code,
@@ -112,10 +119,12 @@ class TelegramController(AbstractNotifierController, AsyncInitable):
         except Exception as error:
             logger.error(f"Message not sent: {error}")
 
-    async def notify_event_resolved(self,
-                                    notification_sink: NotificationSink,
-                                    event_message_components: EventMessageComponents,
-                                    ) -> None:
+    async def notify_event_resolved(
+            self,
+            notification_sink: NotificationSink,
+            event_message_components: EventMessageComponents,
+    ) -> None:
+        """Cast and send end message about resolved event."""
         time_zone = await self.context.database_gateway.get_notification_sink_time_zone(notification_sink.id)
 
         await self.context.telegram_bot.send_message(
@@ -128,6 +137,7 @@ class TelegramController(AbstractNotifierController, AsyncInitable):
     # Telegram commands
 
     async def _handle_start_command(self, message: Message) -> None:
+        """/start command handler."""
         notification_sink = await self.context.database_gateway.get_notification_sink(str(message.chat.id))
         if notification_sink is not None:
             await message.answer(self.context.telegram_renderer.already_working_in_chat)
@@ -168,9 +178,11 @@ class TelegramController(AbstractNotifierController, AsyncInitable):
 
     @staticmethod
     async def _handle_help_command(message: Message) -> None:
+        """/help command handler."""
         await message.answer(TELEGRAM_HELP_MESSAGE, parse_mode=ParseMode.MARKDOWN)
 
     async def _handle_get_current_problems_command(self, message: Message) -> None:
+        """/currentproblems command handler."""
         chat_id: str = str(message.chat.id)
         notification_sink = await self.context.database_gateway.get_notification_sink(chat_id)
         unresolved_events = await self.context.controller.get_unresolved_events(notification_sink)
@@ -179,10 +191,12 @@ class TelegramController(AbstractNotifierController, AsyncInitable):
         await self._send_current_problems_answer(chat_id, answer)
 
     async def _handle_subscription_command(self, message: Message) -> None:
+        """/subscription command handler."""
         keyboard = await self.context.telegram_keyboard_creator.create_monitoring_systems_keyboard()
         await message.answer(text="Subscription settings", reply_markup=keyboard)
 
     async def _handle_time_zone_command(self, message: Message) -> None:
+        """/timezone command handler."""
         notification_sink = await self.context.database_gateway.get_notification_sink(str(message.chat.id))
         time_zone = await self.context.database_gateway.get_notification_sink_time_zone(notification_sink.id)
         await message.answer(
@@ -193,6 +207,7 @@ class TelegramController(AbstractNotifierController, AsyncInitable):
     # Button press handlers:
 
     async def _handle_button_press(self, callback_query: CallbackQuery) -> None:
+        """Any button press handler."""
         button_data = cast_button_data(callback_query.data)
         action = TelegramButtonAction(button_data.action)
         await self._button_action_to_handler[action](callback_query)
@@ -200,9 +215,11 @@ class TelegramController(AbstractNotifierController, AsyncInitable):
 
     @staticmethod
     async def _no_action_button_handler(_: CallbackQuery) -> None:
+        """Handle no action button press."""
         pass
 
     async def _finish_settings(self, callback_query: CallbackQuery) -> None:
+        """Handle finish button press."""
         button_data = cast_button_data(callback_query.data)
         if button_data.start_message_id is not None:
             await self.context.telegram_bot.edit_message_text(
@@ -220,20 +237,21 @@ class TelegramController(AbstractNotifierController, AsyncInitable):
         )
 
     async def _process_host_group_choosing(self, callback_query: CallbackQuery) -> None:
+        """Edit message to host groups choosing message."""
         recipient_id = str(callback_query.message.chat.id)
         button_data = cast_button_data(callback_query.data)
         notification_sink = await self.context.database_gateway.get_notification_sink(recipient_id)
         await self.context.telegram_bot.edit_message_text(
             chat_id=notification_sink.recipient_id,
             message_id=callback_query.message.message_id,
-            text=f"{SpecialSymbol.SUBSECTION} Monitoring system: Zabbix\n\n"
-                 f"Available host groups:",
+            text=f"{SpecialSymbol.SUBSECTION} Monitoring system: Zabbix\n\nAvailable host groups:",
             reply_markup=await self.context.telegram_keyboard_creator.create_host_groups_keyboard(
                 start_message_id=button_data.start_message_id,
             )
         )
 
     async def _process_host_choosing(self, callback_query: CallbackQuery) -> None:
+        """Edit message to hosts choosing message."""
         recipient_id = str(callback_query.message.chat.id)
         button_data = cast_button_data(callback_query.data)
         notification_sink = await self.context.database_gateway.get_notification_sink(recipient_id)
@@ -253,6 +271,7 @@ class TelegramController(AbstractNotifierController, AsyncInitable):
         )
 
     async def _process_trigger_choosing(self, callback_query: CallbackQuery) -> None:
+        """Edit message to triggers choosing message."""
         recipient_id = str(callback_query.message.chat.id)
         button_data = cast_button_data(callback_query.data)
         notification_sink = await self.context.database_gateway.get_notification_sink(recipient_id)
@@ -275,6 +294,7 @@ class TelegramController(AbstractNotifierController, AsyncInitable):
         )
 
     async def _process_time_zone_choosing(self, callback_query: CallbackQuery) -> None:
+        """Edit message to time zones choosing message."""
         recipient_id = str(callback_query.message.chat.id)
         button_data = cast_button_data(callback_query.data)
         notification_sink = await self.context.database_gateway.get_notification_sink(recipient_id)
@@ -289,6 +309,7 @@ class TelegramController(AbstractNotifierController, AsyncInitable):
         )
 
     async def _process_settings(self, callback_query: CallbackQuery) -> None:
+        """Edit message to subscription settings message."""
         button_data = cast_button_data(callback_query.data)
         if button_data.start_message_id:
             await self.context.telegram_bot.edit_message_text(
@@ -310,26 +331,20 @@ class TelegramController(AbstractNotifierController, AsyncInitable):
 
     # Other handlers:
 
-    async def _handle_new_chat_members(self, message: Message):
+    async def _handle_new_chat_members(self, message: Message) -> None:
+        """Handle adding bot to new chat."""
         telegram_bot_id = (await self.context.telegram_bot.get_me()).id
         for chat_member in message.new_chat_members:
             if chat_member.id == telegram_bot_id:
                 await self._handle_start_command(message)
                 break
 
-    async def _handle_kicked_from_chat(self, message: Message):
-        telegram_bot_id = (await self.context.telegram_bot.get_me()).id
-        if message.left_chat_member.id == telegram_bot_id:
-            chat_id = str(message.chat.id)
-            notification_sink = await self.context.database_gateway.get_notification_sink(chat_id)
-            await self.context.controller.process_delete_notification_sink_usages(notification_sink)
-            logger.info(f"Bot kicked from {notification_sink}")
-
     async def _create_unresolved_events_answer(
             self,
             events: list[MonitoringEvent],
             time_zone_code: str,
     ) -> str:
+        """Construct current unresolved events message."""
         if not events:
             return self.context.telegram_renderer.no_active_problems_answer
         answer = "Current problems:\n\n"
@@ -351,6 +366,7 @@ class TelegramController(AbstractNotifierController, AsyncInitable):
         return answer
 
     async def _send_current_problems_answer(self, chat_id: str, answer: str) -> None:
+        """Divide current problems message into several messages."""
         if len(answer) > self.MAX_MESSAGE_LENGTH:
             event_messages = answer.split("\n\n")
             answer_part: str = ""
@@ -369,6 +385,7 @@ class TelegramController(AbstractNotifierController, AsyncInitable):
     # utilities:
 
     async def _set_default_commands(self) -> None:
+        """Set default commands in new chat."""
         bot_commands: list[BotCommand] = []
         for command, description in TELEGRAM_COMMAND_TO_DESCRIPTION.items():
             bot_commands.append(BotCommand(command=command, description=description))
@@ -377,6 +394,7 @@ class TelegramController(AbstractNotifierController, AsyncInitable):
     # database utilities:
 
     async def _set_time_zone(self, callback_query: CallbackQuery) -> None:
+        """Set new user time zone in DB."""
         recipient_id = str(callback_query.message.chat.id)
         button_data = cast_button_data(callback_query.data)
         notification_sink = await self.context.database_gateway.get_notification_sink(recipient_id)
@@ -394,11 +412,13 @@ class TelegramController(AbstractNotifierController, AsyncInitable):
             ),
         )
 
-    async def update_triggers_message(self,
-                                      notification_sink: NotificationSink,
-                                      button_data: TelegramButtonData,
-                                      message_id: str
-                                      ) -> None:
+    async def update_triggers_message(
+            self,
+            notification_sink: NotificationSink,
+            button_data: TelegramButtonData,
+            message_id: str
+    ) -> None:
+        """Update triggers message after subscription or unsubscription."""
         host_id = await self.context.database_gateway.get_host_id_by_trigger_id(button_data.entity_id)
         triggers_keyboard = await self.context.telegram_keyboard_creator.create_triggers_keyboard(
             notification_sink=notification_sink,
@@ -415,6 +435,7 @@ class TelegramController(AbstractNotifierController, AsyncInitable):
     # insert
 
     async def _subscribe_to_trigger(self, callback_query: CallbackQuery) -> None:
+        """Subscribe user to trigger."""
         message_id = str(callback_query.message.message_id)
         recipient_id = str(callback_query.message.chat.id)
         notification_sink = await self.context.database_gateway.get_notification_sink(recipient_id)
@@ -425,6 +446,7 @@ class TelegramController(AbstractNotifierController, AsyncInitable):
         await self.update_triggers_message(notification_sink, button_data, message_id)
 
     async def _pre_subscribe_to_monitoring_system(self, callback_query: CallbackQuery) -> None:
+        """Edit message to warning message before subscribe to all triggers in monitoring system."""
         button_data = cast_button_data(callback_query.data)
         await self.context.telegram_bot.edit_message_text(
             chat_id=callback_query.message.chat.id,
@@ -436,6 +458,7 @@ class TelegramController(AbstractNotifierController, AsyncInitable):
         )
 
     async def _pre_unsubscribe_to_monitoring_system(self, callback_query: CallbackQuery) -> None:
+        """Edit message to warning message before unsubscribe from all triggers in monitoring system."""
         button_data = cast_button_data(callback_query.data)
         await self.context.telegram_bot.edit_message_text(
             chat_id=callback_query.message.chat.id,
@@ -447,6 +470,7 @@ class TelegramController(AbstractNotifierController, AsyncInitable):
         )
 
     async def _subscribe_to_monitoring_system(self, callback_query: CallbackQuery) -> None:
+        """Subscribe user to all triggers in monitoring system."""
         recipient_id = str(callback_query.message.chat.id)
         triggers_len = await self.context.controller.subscribe_to_monitoring_system_triggers(recipient_id)
         await self.context.telegram_bot.send_message(
@@ -455,6 +479,7 @@ class TelegramController(AbstractNotifierController, AsyncInitable):
         )
 
     async def _unsubscribe_from_monitoring_system(self, callback_query: CallbackQuery) -> None:
+        """Unsubscribe user from all triggers in monitoring system."""
         recipient_id = str(callback_query.message.chat.id)
         await self.context.controller.unsubscribe_to_monitoring_system_triggers(recipient_id)
         await self.context.telegram_bot.send_message(
@@ -465,6 +490,7 @@ class TelegramController(AbstractNotifierController, AsyncInitable):
     # delete:
 
     async def _unsubscribe_from_trigger(self, callback_query: CallbackQuery) -> None:
+        """Unsubscribe user from trigger."""
         message_id = str(callback_query.message.message_id)
         recipient_id = str(callback_query.message.chat.id)
         notification_sink = await self.context.database_gateway.get_notification_sink(recipient_id)
@@ -477,4 +503,5 @@ class TelegramController(AbstractNotifierController, AsyncInitable):
 
     @staticmethod
     def _check_is_group_chat(chat_id: int) -> bool:
+        """Check is current chat a group chat."""
         return chat_id < 0

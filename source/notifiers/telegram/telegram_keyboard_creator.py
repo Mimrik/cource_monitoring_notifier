@@ -1,3 +1,4 @@
+"""TelegramKeyboardCreator module."""
 import logging
 from dataclasses import dataclass
 from enum import Enum, unique, StrEnum
@@ -20,6 +21,8 @@ logger = logging.getLogger(__name__)
 
 @unique
 class TelegramButtonAction(StrEnum):
+    """TelegramButtonAction."""
+
     MUTE_TRIGGER = "mute_trigger"
     UNMUTE_TRIGGER = "unmute_trigger"
 
@@ -51,6 +54,8 @@ class TelegramButtonAction(StrEnum):
 
 @unique
 class TimeIntervals(str, Enum):
+    """TimeIntervals."""
+
     ONE_HOUR = "1_hour"
     FOUR_HOURS = "4_hours"
     EIGHT_HOURS = "8_hours"
@@ -59,6 +64,8 @@ class TimeIntervals(str, Enum):
 
 @dataclass(frozen=True)
 class TelegramButtonData:
+    """TelegramButtonData."""
+
     action: str
     entity_id: Optional[int] = None
     mute_code: Optional[str] = None
@@ -66,6 +73,7 @@ class TelegramButtonData:
     start_message_id: Optional[int] = None
 
     def __str__(self):
+        """str."""
         return f"{self.action}|" \
                f"{self.entity_id if self.entity_id is not None else ''}|" \
                f"{self.mute_code if self.mute_code is not None else ''}|" \
@@ -74,6 +82,7 @@ class TelegramButtonData:
 
 
 def cast_button_data(unformed_button_data: str) -> TelegramButtonData:
+    """Cast button data."""
     button_data_attributes = unformed_button_data.split("|")
     return TelegramButtonData(
         action=button_data_attributes[0],
@@ -85,17 +94,23 @@ def cast_button_data(unformed_button_data: str) -> TelegramButtonData:
 
 
 class TelegramKeyboardCreator:
+    """Class for creating all telegram keyboards."""
+
     @dataclass
     class Context:
+        """context."""
+
         controller: Controller
         database_gateway: DatabaseGateway
 
     MAX_KEYBOARD_HEIGHT = 14
 
     def __init__(self, context: Context):
+        """init."""
         self.context = context
 
     async def create_monitoring_systems_keyboard(self, start_message_id: Optional[int] = None) -> InlineKeyboardMarkup:
+        """Create subscription settings keyboard."""
         inline_keyboard = InlineKeyboardMarkup(row_width=1)
         inline_keyboard.add(
             InlineKeyboardButton(
@@ -142,10 +157,8 @@ class TelegramKeyboardCreator:
         inline_keyboard.add(self._create_finish_button(start_message_id))
         return inline_keyboard
 
-    def create_full_subscription_keyboard(
-            self,
-            start_message_id: Optional[int] = None,
-    ) -> InlineKeyboardMarkup:
+    def create_full_subscription_keyboard(self, start_message_id: Optional[int] = None) -> InlineKeyboardMarkup:
+        """Create all triggers subscription keyboard."""
         inline_keyboard = InlineKeyboardMarkup(row_width=1)
         inline_keyboard.add(
             InlineKeyboardButton(
@@ -163,6 +176,7 @@ class TelegramKeyboardCreator:
         return inline_keyboard
 
     def create_full_unsubscription_keyboard(self, start_message_id: Optional[int] = None) -> InlineKeyboardMarkup:
+        """Create all triggers unsubscription keyboard."""
         inline_keyboard = InlineKeyboardMarkup(row_width=1)
         inline_keyboard.add(
             InlineKeyboardButton(
@@ -180,6 +194,7 @@ class TelegramKeyboardCreator:
         return inline_keyboard
 
     async def create_host_groups_keyboard(self, start_message_id: Optional[int] = None) -> InlineKeyboardMarkup:
+        """Create host groups subscription keyboard."""
         host_groups = await self.context.database_gateway.select(HostGroup)
         inline_keyboard = InlineKeyboardMarkup(row_width=2)
         for host_group in host_groups:
@@ -215,6 +230,7 @@ class TelegramKeyboardCreator:
             page_number: int,
             start_message_id: Optional[int] = None,
     ) -> InlineKeyboardMarkup:
+        """Create hosts subscription keyboard."""
         hosts = await self.context.database_gateway.select(Host)
         sorted_hosts = self._sort_hosts_by_host_titles(hosts)
         pages_amount = ceil(len(hosts) / self.MAX_KEYBOARD_HEIGHT)
@@ -277,12 +293,14 @@ class TelegramKeyboardCreator:
         inline_keyboard.add(self._create_finish_button(start_message_id))
         return inline_keyboard
 
-    async def create_triggers_keyboard(self,
-                                       notification_sink: NotificationSink,
-                                       host_id: int,
-                                       page_number: int = 0,
-                                       start_message_id: Optional[int] = None,
-                                       ) -> InlineKeyboardMarkup:
+    async def create_triggers_keyboard(
+            self,
+            notification_sink: NotificationSink,
+            host_id: int,
+            page_number: int = 0,
+            start_message_id: Optional[int] = None,
+    ) -> InlineKeyboardMarkup:
+        """Create triggers subscription keyboard."""
         triggers = await self.context.database_gateway.get_triggers_by_host_id(host_id)
         triggers.sort(key=lambda host: host.title)
         pages_amount = ceil(len(triggers) / self.MAX_KEYBOARD_HEIGHT)
@@ -347,10 +365,12 @@ class TelegramKeyboardCreator:
         inline_keyboard.add(self._create_finish_button(start_message_id))
         return inline_keyboard
 
-    async def create_time_zones_keyboard(self,
-                                         page_number: int = 0,
-                                         start_message_id: Optional[int] = None,
-                                         ) -> InlineKeyboardMarkup:
+    async def create_time_zones_keyboard(
+            self,
+            page_number: int = 0,
+            start_message_id: Optional[int] = None,
+    ) -> InlineKeyboardMarkup:
+        """Create time zone change keyboard."""
         time_zones = await self.context.database_gateway.select(TimeZone)
         pages_amount = ceil(len(time_zones) / self.MAX_KEYBOARD_HEIGHT)
         page = time_zones[page_number * self.MAX_KEYBOARD_HEIGHT: (page_number + 1) * self.MAX_KEYBOARD_HEIGHT]
@@ -412,65 +432,8 @@ class TelegramKeyboardCreator:
         )
         return inline_keyboard
 
-    @staticmethod
-    def create_mute_keyboard(trigger_id: int) -> InlineKeyboardMarkup:
-        inline_keyboard = InlineKeyboardMarkup(row_width=2)
-        inline_keyboard.add(
-            InlineKeyboardButton(
-                text="Mute for 1 hour",
-                callback_data=str(
-                    TelegramButtonData(
-                        action=TelegramButtonAction.MUTE_TRIGGER,
-                        entity_id=trigger_id,
-                        mute_code=TimeIntervals.ONE_HOUR,
-                    )
-                ),
-            ),
-            InlineKeyboardButton(
-                text="Mute for 4 hours",
-                callback_data=str(
-                    TelegramButtonData(
-                        action=TelegramButtonAction.MUTE_TRIGGER,
-                        entity_id=trigger_id,
-                        mute_code=TimeIntervals.FOUR_HOURS,
-                    )
-                ),
-            ),
-            InlineKeyboardButton(
-                text="Mute for 8 hours",
-                callback_data=str(
-                    TelegramButtonData(
-                        action=TelegramButtonAction.MUTE_TRIGGER,
-                        entity_id=trigger_id,
-                        mute_code=TimeIntervals.EIGHT_HOURS,
-                    )
-                ),
-            ),
-            InlineKeyboardButton(
-                text="Mute for 30 seconds",
-                callback_data=str(
-                    TelegramButtonData(
-                        action=TelegramButtonAction.MUTE_TRIGGER,
-                        entity_id=trigger_id,
-                        mute_code=TimeIntervals.TEST_SECONDS,
-                    )
-                ),
-            ),
-        )
-        return inline_keyboard
-
-    @staticmethod
-    def create_unmute_keyboard(trigger_id: int) -> InlineKeyboardMarkup:
-        inline_keyboard = InlineKeyboardMarkup()
-        inline_keyboard.add(
-            InlineKeyboardButton(
-                text="Unmute",
-                callback_data=str(TelegramButtonData(action=TelegramButtonAction.UNMUTE_TRIGGER, entity_id=trigger_id)),
-            )
-        )
-        return inline_keyboard
-
     def _sort_hosts_by_host_titles(self, hosts: list[Host]) -> list[Host]:
+        """Sort hosts for hosts keyboard."""
         host_title_to_host = {host.title: host for host in hosts}
         host_titles = set(host_title_to_host)
         not_ip_address_host_titles = {host_title for host_title in host_titles
@@ -487,6 +450,7 @@ class TelegramKeyboardCreator:
 
     @staticmethod
     def _cast_ip_address_value(ip_address: str) -> int:
+        """Cast ip address value for hosts sorting."""
         unformed_left_values = list(map(int, ip_address.split(":")[0].split(".")))
         first = unformed_left_values[0] * 256 ** 3
         second = unformed_left_values[1] * 256 ** 2
@@ -495,6 +459,7 @@ class TelegramKeyboardCreator:
 
     @staticmethod
     def _is_str_ip_address(string_to_check: str) -> bool:
+        """Check is sting is ip address like 0.0.0.0:0000."""
         if string_to_check.count(".") == 3 and string_to_check.count(":") == 1:
             return True
         return False
@@ -505,6 +470,7 @@ class TelegramKeyboardCreator:
             page_number: int,
             start_message_id: Optional[int] = None,
     ) -> InlineKeyboardButton:
+        """Create unsubscribed trigger button."""
         return InlineKeyboardButton(
             text=f"{SpecialSymbol.UNSUBSCRIBED} {trigger.title}",
             callback_data=str(
@@ -518,10 +484,12 @@ class TelegramKeyboardCreator:
         )
 
     @staticmethod
-    def _create_subscribed_trigger_button(trigger: Trigger,
-                                          page_number: int,
-                                          start_message_id: Optional[int] = None,
-                                          ) -> InlineKeyboardButton:
+    def _create_subscribed_trigger_button(
+            trigger: Trigger,
+            page_number: int,
+            start_message_id: Optional[int] = None,
+    ) -> InlineKeyboardButton:
+        """Create subscribed trigger button."""
         return InlineKeyboardButton(
             text=f"{SpecialSymbol.SUBSCRIBED} {trigger.title}",
             callback_data=str(
@@ -537,6 +505,7 @@ class TelegramKeyboardCreator:
 
     @staticmethod
     def _create_finish_button(start_message_id: Optional[int] = None) -> InlineKeyboardButton:
+        """Create finish button."""
         return InlineKeyboardButton(
             text=f"{SpecialSymbol.FINISH} Finish {SpecialSymbol.FINISH}",
             callback_data=str(
@@ -546,6 +515,7 @@ class TelegramKeyboardCreator:
 
     @staticmethod
     def _create_separator_button(start_message_id: Optional[int] = None) -> InlineKeyboardButton:
+        """Create empty button for separation."""
         return InlineKeyboardButton(
             text="➖",
             callback_data=str(
@@ -555,6 +525,7 @@ class TelegramKeyboardCreator:
 
     @staticmethod
     def _create_back_to_subscription_settings_button(start_message_id: Optional[int] = None) -> InlineKeyboardButton:
+        """Create return button."""
         return InlineKeyboardButton(
             text=f"{SpecialSymbol.BACK} Back to subscription settings",
             callback_data=str(

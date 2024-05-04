@@ -1,3 +1,4 @@
+"""NotificationSinkToTrigger module."""
 from sqlalchemy.orm import mapped_column, Mapped
 
 from sqlalchemy_tools.entity_helpers.fk_keys import RestrictForeignKey
@@ -10,6 +11,8 @@ from utils.timestamp_converters import CURRENT_TIMESTAMP_SEC_SQL_CLAUSE, get_cur
 
 @sqlalchemy_mapper_registry.mapped_as_dataclass
 class NotificationSinkToTrigger:
+    """NotificationSink to monitoring system trigger."""
+
     __tablename__ = "notification_sink_to_trigger"
 
     notification_sink_id: Mapped[int] = mapped_column(

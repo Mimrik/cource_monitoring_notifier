@@ -1,3 +1,4 @@
+"""DatabaseGateway module."""
 import logging
 from dataclasses import dataclass
 
@@ -21,11 +22,16 @@ Entity = TypeVar("Entity")
 
 
 class DatabaseGateway:
+    """Class for working with DB."""
+
     @dataclass
     class Context:
+        """context."""
+
         database_session_maker: DatabaseSessionMaker
 
     def __init__(self, context: Context) -> None:
+        """init."""
         self.context = context
         self.ensure_session = self.context.database_session_maker.ensure_session
         logger.info(f"{type(self).__name__} inited")
@@ -33,12 +39,14 @@ class DatabaseGateway:
     # SELECT
 
     async def select(self, entity_type: type[Entity]) -> list[Entity]:
+        """Select entities from DB."""
         async with self.ensure_session() as session:
             query = select(entity_type)
             query = query.where(entity_type.id > 0)
             return (await session.execute(query)).scalars().all()
 
     async def get_entity_by_id(self, entity_type: type[Entity], entity_id: int) -> Entity:
+        """Select entity by id from DB."""
         async with self.ensure_session() as session:
             query = select(
                 entity_type
@@ -48,6 +56,7 @@ class DatabaseGateway:
             return (await session.execute(query)).scalar()
 
     async def get_host_id_by_trigger_id(self, trigger_id: int) -> int:
+        """Select host id by trigger id from DB."""
         async with self.ensure_session() as session:
             query = select(
                 Host.id
@@ -59,6 +68,7 @@ class DatabaseGateway:
             return (await session.execute(query)).scalar()
 
     async def get_hosts_by_host_group_id(self, host_group_id: int) -> list[Host]:
+        """Select hosts by host group id from DB."""
         async with self.ensure_session() as session:
             query = select(
                 Host
@@ -72,6 +82,7 @@ class DatabaseGateway:
             return (await session.execute(query)).scalars().all()
 
     async def get_host_groups_by_host_id(self, host_id: int) -> list[HostGroup]:
+        """Select host groups by host id from DB."""
         async with self.ensure_session() as session:
             query = select(
                 HostGroup
@@ -85,6 +96,7 @@ class DatabaseGateway:
             return (await session.execute(query)).scalars().all()
 
     async def get_triggers_by_host_id(self, host_id: int) -> list[Trigger]:
+        """Select triggers by host id from DB."""
         async with self.ensure_session() as session:
             query = select(
                 Trigger
@@ -94,6 +106,7 @@ class DatabaseGateway:
             return (await session.execute(query)).scalars().all()
 
     async def get_triggers_by_notification_sink_id(self, notification_sink_id: int) -> list[Trigger]:
+        """Select triggers by notification sink id from DB."""
         async with self.ensure_session() as session:
             query = select(
                 Trigger
@@ -105,6 +118,7 @@ class DatabaseGateway:
             return (await session.execute(query)).scalars().all()
 
     async def get_notification_sinks_by_trigger_id(self, trigger_id: int) -> list[NotificationSink]:
+        """Select notification_sinks by trigger id from DB."""
         async with self.ensure_session() as session:
             query = select(
                 NotificationSink
@@ -116,6 +130,7 @@ class DatabaseGateway:
             return (await session.execute(query)).scalars().all()
 
     async def get_notification_sink(self, recipient_id: str) -> NotificationSink:
+        """Select notification_sink from DB."""
         async with self.ensure_session() as session:
             query = select(
                 NotificationSink
@@ -125,6 +140,7 @@ class DatabaseGateway:
             return (await session.execute(query)).scalar()
 
     async def get_notification_sink_time_zone(self, notification_sink_id: int) -> TimeZone:
+        """Select notification sinks time zone from DB."""
         async with self.ensure_session() as session:
             query = select(
                 TimeZone
@@ -138,6 +154,7 @@ class DatabaseGateway:
     # INSERT
 
     async def insert(self, entities: Entity | list[Entity]) -> None:
+        """Insert entities to DB."""
         if not isinstance(entities, list):
             entities = [entities]
 
@@ -149,6 +166,7 @@ class DatabaseGateway:
     # UPDATE
 
     async def enable_host_groups(self, host_group_ids: list[int]) -> None:
+        """Enable host groups in DB."""
         async with self.ensure_session() as session:
             query = update(
                 HostGroup
@@ -162,6 +180,7 @@ class DatabaseGateway:
             await session.execute(query)
 
     async def disable_host_groups(self, host_group_ids: list[int]) -> None:
+        """Disable host groups in DB."""
         async with self.ensure_session() as session:
             query = update(
                 HostGroup
@@ -175,6 +194,7 @@ class DatabaseGateway:
             await session.execute(query)
 
     async def update_notification_sink_time_zone_id(self, notification_sink_id: int, time_zone_id: int) -> None:
+        """Change notification sink time zone in DB."""
         async with self.ensure_session() as session:
             query = update(
                 NotificationSink
@@ -190,6 +210,7 @@ class DatabaseGateway:
     # DELETE:
 
     async def delete_notification_sink_to_trigger_by_id(self, notification_sink_id: int, trigger_id: int) -> None:
+        """Delete notification sink to trigger by id from DB."""
         async with self.ensure_session() as session:
             query = delete(
                 NotificationSinkToTrigger
@@ -202,6 +223,7 @@ class DatabaseGateway:
             await session.execute(query)
 
     async def delete_notification_sink_to_trigger(self, notification_sink_id: int) -> None:
+        """Delete notification sink to trigger from DB."""
         async with self.ensure_session() as session:
             query = delete(
                 NotificationSinkToTrigger

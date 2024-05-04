@@ -1,3 +1,4 @@
+"""TelegramRenderer module."""
 import datetime
 import logging
 from enum import StrEnum
@@ -14,6 +15,8 @@ logger = logging.getLogger(__name__)
 
 
 class TelegramCommand(StrEnum):
+    """TelegramCommand."""
+
     START = "start"
     HELP = "help"
     GET_CURRENT_PROBLEMS = "currentproblems"
@@ -51,7 +54,10 @@ TELEGRAM_HELP_MESSAGE = text(
 
 
 class TelegramRenderer:
+    """Class for rendering all telegram messages."""
+
     def __init__(self) -> None:
+        """init."""
         self.no_active_problems_answer = "No problems"
         self.no_permission_answer = "You don't have permission for this command"
         self.already_working_in_chat = "I'm already working in this chat"
@@ -73,10 +79,12 @@ class TelegramRenderer:
         }
         logger.info(f"{type(self).__name__} inited")
 
-    async def render_event_message_text(self,
-                                        event_message_components: EventMessageComponents,
-                                        time_zone_code: str,
-                                        ) -> Optional[str]:
+    async def render_event_message_text(
+            self,
+            event_message_components: EventMessageComponents,
+            time_zone_code: str,
+    ) -> Optional[str]:
+        """Render event message text."""
         emoji = self._severity_id_to_emoji[event_message_components.trigger.severity]
         caption = self._render_caption(event_message_components.event, event_message_components.trigger.severity)
         event_origin = self._render_event_origin(
@@ -94,22 +102,15 @@ class TelegramRenderer:
 
     @staticmethod
     def render_subscription_clarifying_question(monitoring_system_title: str):
+        """Render subscription clarifying question text."""
         return f"Are you sure that you want to subscribe to all {monitoring_system_title} triggers? " \
                f"The number of triggers is too large for the average user"
 
     @staticmethod
-    def render_unsubscription_clarifying_question(monitoring_system_title: str):
+    def render_unsubscription_clarifying_question(monitoring_system_title: str) -> str:
+        """Render unsubscription clarifying question text."""
         return f"Are you sure that you want to unsubscribe from all {monitoring_system_title} triggers? " \
                f"This action will reset all your subscriptions in this monitoring system"
-
-    @staticmethod
-    def _render_trigger_labels(attributes: dict[str, str]) -> str:
-        result = f"{SpecialSymbol.SECTION} Labels:\n"
-        result += "\n".join(
-            f"{SUBSECTION_INDENT}{SpecialSymbol.SUBSECTION} {label_name}: {label_value}"
-            for label_name, label_value in attributes.items()
-        )
-        return result
 
     @staticmethod
     def _render_event_origin(
@@ -118,6 +119,7 @@ class TelegramRenderer:
             host_group_titles: list[str],
             monitoring_system_title: str
     ) -> str:
+        """Render event message origin text."""
         result = f"{SpecialSymbol.SECTION} Source:\n"
         prefix = f"{SUBSECTION_INDENT}{SpecialSymbol.SUBSECTION}"
         result += f"{prefix} Monitoring system: {monitoring_system_title}\n"
@@ -127,14 +129,17 @@ class TelegramRenderer:
         return result
 
     def _render_caption(self, event: MonitoringEvent, severity_id: int) -> str:
+        """Render event message caption text."""
         return f"{self._severity_id_to_severity_name[severity_id]} event {event.external_id}"
 
     @staticmethod
     def _render_occurred_at(occurred_at: int, time_zone_code: str) -> str:
+        """Render occurred at date text."""
         return f"{SpecialSymbol.SECTION} Occurred at {localize_and_cast_date_title(occurred_at, time_zone_code)}"
 
     @staticmethod
     def render_resolved_event_caption(event: MonitoringEvent, time_zone_code: str) -> str:
+        """Render resolved event caption text."""
         date = localize_and_cast_date_title(event.resolved_at, time_zone_code)
         return f"✅ Event {event.external_id} resolved at {date} " \
                f"(in {datetime.timedelta(seconds=event.resolved_at - event.occurred_at)})"
@@ -146,6 +151,7 @@ class TelegramRenderer:
             is_time_zone_chosen: bool = False,
             is_subscription_finished: bool = False,
     ) -> str:
+        """Render start message text."""
         message_text = "Greetings!\n" \
                        "I will send you monitoring events.\n\n" \
                        "Before we begin, let's make initial settings:\n"
@@ -170,4 +176,5 @@ class TelegramRenderer:
 
     @staticmethod
     def render_time_zones_message_text(time_zone_title: str) -> str:
+        """Render current user time zone text."""
         return f"Your current time zone is {time_zone_title}"

@@ -1,3 +1,4 @@
+"""Database module."""
 import asyncio
 import logging
 from dataclasses import dataclass
@@ -18,6 +19,8 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class HostGroupsDiff:
+    """HostGroupsDiff."""
+
     new_host_groups: list[HostGroup]
     obsolete_host_groups: list[HostGroup]
     enabled_host_groups: list[HostGroup]
@@ -25,12 +28,16 @@ class HostGroupsDiff:
 
 @dataclass
 class HostSource:
+    """HostSource."""
+
     host_group_id: int
     host: Host
 
 
 @dataclass
 class HostsDiff:
+    """HostsDiff."""
+
     new_host_sources: list[HostSource]
     obsolete_host_sources: list[HostSource]
     enabled_host_sources: list[HostSource]
@@ -38,31 +45,42 @@ class HostsDiff:
 
 @dataclass
 class TriggersDiff:
+    """TriggersDiff."""
+
     appeared_triggers: list[Trigger]
     obsolete_triggers: list[Trigger]
     enabled_triggers: list[Trigger]
 
 
 class DatabaseActualizer(AsyncInitable):
+    """Update Zabbix entities in the database."""
+
     @dataclass
     class Config:
+        """config."""
+
         actualization_interval_sec: int
 
     @dataclass
     class Context:
+        """context."""
+
         database_gateway: DatabaseGateway
         monitoring_system_controller: AbstractMonitoringSystemController
 
     def __init__(self, config: Config, context: Context) -> None:
+        """init."""
         AsyncInitable.__init__(self)
         self.config = config
         self.context = context
         logger.info(f"{type(self).__name__} inited")
 
     async def _async_init(self) -> None:
+        """Start actualizing task on application start.."""
         await self._actualize_monitoring_system_structure()
 
     async def _actualize_monitoring_system_structure(self) -> NoReturn:
+        """Update Zabbix entities in the database."""
         while True:
             try:
                 await self._actualize_host_groups()
@@ -73,6 +91,7 @@ class DatabaseActualizer(AsyncInitable):
             await asyncio.sleep(self.config.actualization_interval_sec)
 
     async def _actualize_host_groups(self) -> None:
+        """Update Zabbix host groups in the database."""
         actual_host_groups = await self.context.monitoring_system_controller.get_host_groups()
         saved_host_groups = await self.context.database_gateway.select(HostGroup)
 
@@ -100,6 +119,7 @@ class DatabaseActualizer(AsyncInitable):
             actual_host_groups: list[HostGroup],
             saved_host_groups: list[HostGroup],
     ) -> HostGroupsDiff:
+        """Collect group hosts difference with Zabbix and DB."""
         actual_host_group_id_to_host_group = {host_group.id: host_group for host_group in actual_host_groups}
         actual_host_group_ids = set(actual_host_group_id_to_host_group)
 
@@ -125,6 +145,7 @@ class DatabaseActualizer(AsyncInitable):
         )
 
     async def _actualize_hosts(self) -> None:
+        """Update Zabbix hosts in the database."""
         actual_host_group_id_to_hosts = await self.context.monitoring_system_controller.get_host_group_id_to_hosts()
 
         saved_host_group_id_to_hosts = await self._get_host_group_id_to_hosts()
@@ -134,7 +155,7 @@ class DatabaseActualizer(AsyncInitable):
             saved_host_group_id_to_hosts=saved_host_group_id_to_hosts,
         )
 
-        await self.insert_host_sources(hosts_diff.new_host_sources)
+        await self._insert_host_sources(hosts_diff.new_host_sources)
 
         logger.info(f"Inserted {len(hosts_diff.new_host_sources)} new host sources. "
                     f"Enabled {len([])} host sources. "
@@ -146,6 +167,7 @@ class DatabaseActualizer(AsyncInitable):
         actual_host_group_id_to_hosts: dict[int, list[Host]],
         saved_host_group_id_to_hosts: dict[int, list[Host]],
     ) -> HostsDiff:
+        """Collect hosts difference with Zabbix and DB."""
         actual_host_group_id_to_host_ids: dict[int, set[int]] = {}
         actual_host_id_to_host = {}
         for group_id, hosts in actual_host_group_id_to_hosts.items():
@@ -173,7 +195,8 @@ class DatabaseActualizer(AsyncInitable):
             obsolete_host_sources=[],
         )
 
-    async def insert_host_sources(self, host_sources: list[HostSource]) -> None:
+    async def _insert_host_sources(self, host_sources: list[HostSource]) -> None:
+        """Insert new hosts to DB."""
         if not host_sources:
             return
 
@@ -184,6 +207,7 @@ class DatabaseActualizer(AsyncInitable):
             )
 
     async def _actualize_triggers(self) -> None:
+        """Update Zabbix triggers in the database."""
         actual_triggers = await self.context.monitoring_system_controller.get_triggers()
         saved_triggers = await self.context.database_gateway.select(Trigger)
 
@@ -200,6 +224,7 @@ class DatabaseActualizer(AsyncInitable):
 
     @staticmethod
     async def _cast_triggers_diff(*, actual_triggers: list[Trigger], saved_triggers: list[Trigger]) -> TriggersDiff:
+        """Collect triggers difference with Zabbix and DB."""
         actual_trigger_id_to_trigger = {trigger.id: trigger for trigger in actual_triggers}
         actual_trigger_ids = set(actual_trigger_id_to_trigger)
         saved_trigger_id_to_trigger = {trigger.id: trigger for trigger in saved_triggers}
@@ -221,6 +246,7 @@ class DatabaseActualizer(AsyncInitable):
         )
 
     async def _get_host_group_id_to_hosts(self) -> dict[int, list[Host]]:
+        """Get host groups and hosts from DB."""
         host_group_id_to_hosts: dict[int, list[Host]] = {}
         async with self.context.database_gateway.ensure_session():
             host_groups = await self.context.database_gateway.select(HostGroup)

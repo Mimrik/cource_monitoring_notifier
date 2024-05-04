@@ -1,3 +1,4 @@
+"""ZabbixConnector module."""
 from dataclasses import dataclass
 import logging
 from typing import Any
@@ -10,12 +11,16 @@ logger = logging.getLogger(__name__)
 
 @dataclass(frozen=True)
 class ZabbixHostGroup:
+    """ZabbixHostGroup."""
+
     groupid: int
     name: str
 
 
 @dataclass(frozen=True)
 class ZabbixHost:
+    """ZabbixHost."""
+
     hostid: int
     name: str
     group_ids: frozenset[int]
@@ -23,6 +28,8 @@ class ZabbixHost:
 
 @dataclass(frozen=True)
 class ZabbixTrigger:
+    """ZabbixTrigger."""
+
     triggerid: str
     description: str
     priority: str
@@ -31,6 +38,8 @@ class ZabbixTrigger:
 
 @dataclass(frozen=True)
 class ZabbixProblem:
+    """ZabbixProblem."""
+
     external_id: str
     trigger_external_id: str
     trigger_title: str
@@ -40,13 +49,18 @@ class ZabbixProblem:
 
 
 class ZabbixConnector:
+    """Connector to Zabbix."""
+
     @dataclass(kw_only=True)
     class Config(HttpServerConnector.Config):
+        """config."""
+
         api_key: str
 
     Context = HttpServerConnector.Context
 
     def __init__(self, config: Config, context: Context) -> None:
+        """init."""
         self.config = config
         self.context = context
         self._http_connector = HttpServerConnector(config, context)
@@ -54,6 +68,7 @@ class ZabbixConnector:
         logger.info(f"{type(self).__name__} inited")
 
     async def get_host_groups(self) -> list[ZabbixHostGroup]:
+        """Get Zabbix host groups."""
         payload = {
             "jsonrpc": "2.0",
             "method": "host.get",
@@ -75,6 +90,7 @@ class ZabbixConnector:
         return list(host_group_external_id_to_host_group.values())
 
     async def get_hosts(self) -> set[ZabbixHost]:
+        """Get Zabbix hosts."""
         payload = {
             "jsonrpc": "2.0",
             "method": "host.get",
@@ -100,6 +116,7 @@ class ZabbixConnector:
         return zabbix_hosts
 
     async def get_triggers(self) -> set[ZabbixTrigger]:
+        """Get Zabbix triggers."""
         payload = {
             "jsonrpc": "2.0",
             "method": "trigger.get",
@@ -128,6 +145,7 @@ class ZabbixConnector:
         return zabbix_triggers
 
     async def get_problems(self) -> set[ZabbixProblem]:
+        """Get Zabbix problems."""
         payload = {
             "jsonrpc": "2.0",
             "method": "problem.get",
@@ -155,6 +173,7 @@ class ZabbixConnector:
 
     @staticmethod
     def _parse_answer(answer: dict[str, Any]) -> list[dict[str, Any]]:
+        """Parse Zabbix answer."""
         if not isinstance(answer, dict):
             raise HTTPBadRequest(reason=f"Zabbix answer is not a dict: {answer}")
         try:

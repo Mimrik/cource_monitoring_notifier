@@ -1,3 +1,4 @@
+"""HostToHostGroup module."""
 from sqlalchemy.orm import mapped_column, Mapped
 from sqlalchemy_tools.entity_helpers.fk_keys import RestrictForeignKey
 
@@ -10,6 +11,8 @@ from utils.timestamp_converters import CURRENT_TIMESTAMP_SEC_SQL_CLAUSE, get_cur
 
 @sqlalchemy_mapper_registry.mapped_as_dataclass
 class HostToHostGroup:
+    """Monitoring system host to host group table."""
+
     __tablename__ = "host_to_host_group"
 
     host_id: Mapped[int] = mapped_column(

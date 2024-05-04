@@ -1,3 +1,4 @@
+"""AbstractNotifierController module."""
 import abc
 from dataclasses import dataclass
 
@@ -11,6 +12,8 @@ from monitoring_systems.abstract_monitoring_system_controller import MonitoringE
 
 @dataclass
 class EventMessageComponents:
+    """EventMessageComponents."""
+
     event: MonitoringEvent
     trigger: Trigger
     host: Host
@@ -19,12 +22,15 @@ class EventMessageComponents:
 
 
 class AbstractNotifierController(abc.ABC):
+    """Notifier skeleton for Controller."""
+
     @abc.abstractmethod
     async def notify_event_raised(
         self,
         notification_sink: NotificationSink,
         event_message_components: EventMessageComponents,
     ) -> None:
+        """Notify about raised event."""
         pass
 
     @abc.abstractmethod
@@ -33,4 +39,5 @@ class AbstractNotifierController(abc.ABC):
         notification_sink: NotificationSink,
         event_message_components: EventMessageComponents,
     ) -> None:
+        """Notify about resolved event."""
         pass

@@ -1,3 +1,4 @@
+"""ZabbixController module."""
 from dataclasses import dataclass
 import asyncio
 import logging
@@ -18,31 +19,42 @@ logger = logging.getLogger(__name__)
 
 @unique
 class TriggerStatus(StrEnum):
+    """TriggerStatus."""
+
     RAISED = "raised"
     RESOLVED = "resolved"
 
 
 class ZabbixController(AbstractMonitoringSystemController, AsyncInitable):
+    """Main Zabbix logic."""
+
     @dataclass
     class Config:
+        """config."""
+
         collection_interval_sec: int
 
     @dataclass
     class Context:
+        """context."""
+
         controller: Controller
         zabbix_connector: ZabbixConnector
 
     def __init__(self, config: Config, context: Context) -> None:
+        """init."""
         AsyncInitable.__init__(self)
         self.config = config
         self.context = context
         logger.info(f"{type(self).__name__} inited")
 
     async def get_host_groups(self) -> list[HostGroup]:
+        """Get actual Zabbix host groups."""
         zabbix_host_groups = await self.context.zabbix_connector.get_host_groups()
         return [HostGroup(id=int(group.groupid), title=group.name) for group in zabbix_host_groups]
 
     async def get_host_group_id_to_hosts(self) -> dict[int, list[Host]]:
+        """Get actual Zabbix host groups and hosts."""
         zabbix_hosts = await self.context.zabbix_connector.get_hosts()
         host_group_id_to_hosts = {}
         for host in zabbix_hosts:
@@ -51,6 +63,7 @@ class ZabbixController(AbstractMonitoringSystemController, AsyncInitable):
         return host_group_id_to_hosts
 
     async def get_triggers(self) -> list[Trigger]:
+        """Get actual Zabbix triggers."""
         zabbix_triggers = await self.context.zabbix_connector.get_triggers()
         return [
             Trigger(
@@ -63,6 +76,7 @@ class ZabbixController(AbstractMonitoringSystemController, AsyncInitable):
         ]
 
     async def get_unresolved_events(self) -> list[MonitoringEvent]:
+        """Get actual monitoring system unresolved events."""
         current_cycle_problems = await self.context.zabbix_connector.get_problems()
         events = []
         for problem in current_cycle_problems:
@@ -78,9 +92,11 @@ class ZabbixController(AbstractMonitoringSystemController, AsyncInitable):
         return events
 
     async def _async_init(self) -> None:
+        """Start collecting task on application start."""
         asyncio.create_task(self._collect_monitoring_events())
 
     async def _collect_monitoring_events(self) -> None:
+        """Periodic collect actual raised and resolved monitoring events."""
         logger.debug("Collecting monitoring events started")
         events: list[MonitoringEvent] = []
         current_cycle_problems = await self.context.zabbix_connector.get_problems()
@@ -131,6 +147,7 @@ class ZabbixController(AbstractMonitoringSystemController, AsyncInitable):
         current_cycle_problems: set[ZabbixProblem],
         previous_cycle_problems: set[ZabbixProblem],
     ) -> set[ZabbixProblem]:
+        """Construct raised Zabbix problems at current moment."""
         previous_problem_external_ids = {problem.external_id for problem in previous_cycle_problems}
         current_problem_external_ids = {problem.external_id for problem in current_cycle_problems}
         raised_problem_external_ids = current_problem_external_ids - previous_problem_external_ids
@@ -142,6 +159,7 @@ class ZabbixController(AbstractMonitoringSystemController, AsyncInitable):
         current_cycle_problems: set[ZabbixProblem],
         previous_cycle_problems: set[ZabbixProblem],
     ) -> set[ZabbixProblem]:
+        """Construct resolved Zabbix problems at current moment."""
         previous_problem_external_ids = {problem.external_id for problem in previous_cycle_problems}
         current_problem_external_ids = {problem.external_id for problem in current_cycle_problems}
         resolved_problem_external_ids = previous_problem_external_ids - current_problem_external_ids

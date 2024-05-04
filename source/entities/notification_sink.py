@@ -1,3 +1,4 @@
+"""NotificationSink module."""
 from sqlalchemy import text
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy_tools.entity_helpers.fk_keys import RestrictForeignKey
@@ -12,6 +13,8 @@ DEFAULT_TIME_ZONE_ID = text(f"{time_zone_code_to_time_zone_id['Etc/GMT']}")
 
 @sqlalchemy_mapper_registry.mapped_as_dataclass
 class NotificationSink:
+    """NotificationSink (user)."""
+
     __tablename__ = "notification_sink"
 
     id: Mapped[int] = mapped_column(primary_key=True, init=False)

@@ -1,3 +1,4 @@
+"""Host module."""
 from sqlalchemy.orm import mapped_column, Mapped
 
 from sqlalchemy_tools.entity_helpers.sqlalchemy_base import sqlalchemy_mapper_registry
@@ -7,6 +8,8 @@ from utils.timestamp_converters import CURRENT_TIMESTAMP_SEC_SQL_CLAUSE, get_cur
 
 @sqlalchemy_mapper_registry.mapped_as_dataclass
 class Host:
+    """Monitoring system host table."""
+
     __tablename__ = "host"
 
     id: Mapped[int] = mapped_column(primary_key=True, init=True)

@@ -21,6 +21,7 @@ coverage = "^7.5.0"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "^7.0.0"
+pydocstyle = "^6.3.0"
 
 [build-system]
 requires = ["poetry-core"]

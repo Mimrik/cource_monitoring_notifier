@@ -1,3 +1,4 @@
+"""Main module."""
 import asyncio
 import logging
 from typing import NoReturn
@@ -11,8 +12,10 @@ initer = Initer()
 
 
 async def main() -> NoReturn:
-    async with initer as controller:
-        await controller.run()
+    """Init components and work."""
+    async with initer:
+        while True:
+            await asyncio.sleep(1)
 
 try:
     asyncio.run(main())

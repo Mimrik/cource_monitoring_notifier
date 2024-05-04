@@ -1,3 +1,4 @@
+"""TimeZone module."""
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy_tools.entity_helpers.setter import set_ids
 from sqlalchemy_tools.entity_helpers.sqlalchemy_base import sqlalchemy_mapper_registry, register_initial_values
@@ -8,6 +9,8 @@ from utils.timestamp_converters import CURRENT_TIMESTAMP_SEC_SQL_CLAUSE, get_cur
 
 @sqlalchemy_mapper_registry.mapped_as_dataclass
 class TimeZone:
+    """NotificationSink TimeZone."""
+
     __tablename__ = "time_zone"
 
     id: Mapped[int] = mapped_column(primary_key=True, init=False)

@@ -1,7 +1,10 @@
+"""Special symbols for telegram."""
 from enum import StrEnum
 
 
 class SpecialSymbol(StrEnum):
+    """Special symbols for telegram."""
+
     SECTION = "🔸"
     SUBSECTION = "🔹"
     SUBSCRIBED = "✅"
