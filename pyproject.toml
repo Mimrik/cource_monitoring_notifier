@@ -2,7 +2,7 @@
 name = "cource-moniroring-notifier"
 version = "0.1.0"
 description = ""
-authors = ["Mimrik <misha@mamrov.ru>", "fraundist <fraundist@gmail.com>"]
+authors = ["Mimrik <misha@mamrov.ru>", "fraundist <fraundist@gmail.com>", "pldmval <pdmitry05@yandex.ru>"]
 readme = "README.md"
 source = [
     {name = "PyPI", priority = "default"},
@@ -18,6 +18,7 @@ async-tools-abm={version="2.1.57881", source="abm_pypi"}
 sqlalchemy-tools-abm={version="2.0.58719", source="abm_pypi"}
 http-tools-abm={version="5.3.59932", source="abm_pypi"}
 coverage = "^7.5.0"
+sphinx = "^7.3.7"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "^7.0.0"
