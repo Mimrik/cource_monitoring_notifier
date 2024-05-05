@@ -548,10 +548,10 @@ class TelegramController(AbstractNotifierController, AsyncInitable):
             chat_id=recipient_id,
             message_id=callback_query.message.message_id,
             text=self.context.telegram_renderer.render_languages_message_text(
-                LANGUAGE_CODE_TO_TITLE[language_code], notification_sink.language_code
+                LANGUAGE_CODE_TO_TITLE[language_code], language_code
             ),
             reply_markup=await self.context.telegram_keyboard_creator.create_languages_keyboard(
-                language_code=notification_sink.language_code,
+                language_code=language_code,
                 start_message_id=button_data.start_message_id,
             ),
         )
