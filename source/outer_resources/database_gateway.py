@@ -15,6 +15,7 @@ from entities.notification_sink import NotificationSink
 from entities.notification_sink_to_trigger import NotificationSinkToTrigger
 from entities.time_zone import TimeZone
 from utils.timestamp_converters import get_current_time_sec
+from utils.translation import LanguageCode
 
 logger = logging.getLogger(__name__)
 
@@ -151,6 +152,16 @@ class DatabaseGateway:
             )
             return (await session.execute(query)).scalar()
 
+    async def get_notification_sink_language_code(self, notification_sink_id: int) -> LanguageCode:
+        """Select notification sinks time zone from DB."""
+        async with self.ensure_session() as session:
+            query = select(
+                NotificationSink.language_code
+            ).where(
+                NotificationSink.id == notification_sink_id
+            )
+            return (await session.execute(query)).scalar()
+
     # INSERT
 
     async def insert(self, entities: Entity | list[Entity]) -> None:
@@ -202,8 +213,22 @@ class DatabaseGateway:
                 NotificationSink.id == notification_sink_id
             ).values(
                 {NotificationSink.time_zone_id: time_zone_id}
-            ).returning(
-                NotificationSink.id
+            )
+            await session.execute(query)
+
+    async def update_notification_sink_language_code(
+            self,
+            notification_sink_id: int,
+            language_code: LanguageCode,
+    ) -> None:
+        """Change notification sink language code in DB."""
+        async with self.ensure_session() as session:
+            query = update(
+                NotificationSink
+            ).where(
+                NotificationSink.id == notification_sink_id
+            ).values(
+                {NotificationSink.language_code: language_code}
             )
             await session.execute(query)
 

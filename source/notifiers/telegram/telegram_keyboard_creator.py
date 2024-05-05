@@ -15,6 +15,7 @@ from entities.notification_sink import NotificationSink
 from entities.time_zone import TimeZone
 from outer_resources.database_gateway import DatabaseGateway
 from utils.special_symbols import SpecialSymbol
+from utils.translation import _, LanguageCode, LanguageTitle
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +36,7 @@ class TelegramButtonAction(StrEnum):
     PRE_SUBSCRIBE_MONITORING_SYSTEM = "pre_subscribe_monitoring_system"
 
     SET_TIME_ZONE = "set_time_zone"
+    SET_LANGUAGE = "set_language"
 
     UNSUBSCRIBE_TRIGGER = "unsubscribe_trigger"
     UNSUBSCRIBE_TRIGGERS_WITH_LABEL = "unsubscribe_label"
@@ -52,22 +54,12 @@ class TelegramButtonAction(StrEnum):
     NO_ACTION = "no_action"
 
 
-@unique
-class TimeIntervals(str, Enum):
-    """TimeIntervals."""
-
-    ONE_HOUR = "1_hour"
-    FOUR_HOURS = "4_hours"
-    EIGHT_HOURS = "8_hours"
-    TEST_SECONDS = "30_seconds"
-
-
 @dataclass(frozen=True)
 class TelegramButtonData:
     """TelegramButtonData."""
 
     action: str
-    entity_id: Optional[int] = None
+    entity_id: Optional[int | LanguageCode] = None
     mute_code: Optional[str] = None
     page_number: Optional[int] = None
     start_message_id: Optional[int] = None
@@ -84,9 +76,17 @@ class TelegramButtonData:
 def cast_button_data(unformed_button_data: str) -> TelegramButtonData:
     """Cast button data."""
     button_data_attributes = unformed_button_data.split("|")
+    try:
+        entity_id = int(button_data_attributes[1])
+    except Exception:
+        if isinstance(button_data_attributes[1], str):
+            entity_id = button_data_attributes[1]
+        else:
+            entity_id = None
+
     return TelegramButtonData(
         action=button_data_attributes[0],
-        entity_id=int(button_data_attributes[1]) if button_data_attributes[1] else None,
+        entity_id=entity_id,
         mute_code=button_data_attributes[2] if button_data_attributes[2] else None,
         page_number=int(button_data_attributes[3]) if button_data_attributes[3] else None,
         start_message_id=int(button_data_attributes[4]) if button_data_attributes[4] else None,
@@ -109,7 +109,11 @@ class TelegramKeyboardCreator:
         """init."""
         self.context = context
 
-    async def create_monitoring_systems_keyboard(self, start_message_id: Optional[int] = None) -> InlineKeyboardMarkup:
+    async def create_monitoring_systems_keyboard(
+            self,
+            language_code: LanguageCode,
+            start_message_id: Optional[int] = None,
+    ) -> InlineKeyboardMarkup:
         """Create subscription settings keyboard."""
         inline_keyboard = InlineKeyboardMarkup(row_width=1)
         inline_keyboard.add(
@@ -122,7 +126,7 @@ class TelegramKeyboardCreator:
         )
         inline_keyboard.add(
             InlineKeyboardButton(
-                text="manage subscriptions",
+                text=_("manage subscriptions", language_code),
                 callback_data=str(
                     TelegramButtonData(
                         action=TelegramButtonAction.GO_TO_HOST_GROUPS,
@@ -133,7 +137,7 @@ class TelegramKeyboardCreator:
         )
         inline_keyboard.add(
             InlineKeyboardButton(
-                text="subscribe to all triggers",
+                text=_("subscribe to all triggers", language_code),
                 callback_data=str(
                     TelegramButtonData(
                         action=TelegramButtonAction.PRE_SUBSCRIBE_MONITORING_SYSTEM,
@@ -144,7 +148,7 @@ class TelegramKeyboardCreator:
         )
         inline_keyboard.add(
             InlineKeyboardButton(
-                text="unsubscribe from all triggers",
+                text=_("unsubscribe from all triggers", language_code),
                 callback_data=str(
                     TelegramButtonData(
                         action=TelegramButtonAction.PRE_UNSUBSCRIBE_MONITORING_SYSTEM,
@@ -154,15 +158,21 @@ class TelegramKeyboardCreator:
             )
         )
         inline_keyboard.add(self._create_separator_button(start_message_id))
-        inline_keyboard.add(self._create_finish_button(start_message_id))
+        inline_keyboard.add(self._create_finish_button(language_code, start_message_id))
         return inline_keyboard
 
-    def create_full_subscription_keyboard(self, start_message_id: Optional[int] = None) -> InlineKeyboardMarkup:
+    def create_full_subscription_keyboard(
+            self,
+            language_code: LanguageCode,
+            start_message_id: Optional[int] = None,
+    ) -> InlineKeyboardMarkup:
         """Create all triggers subscription keyboard."""
         inline_keyboard = InlineKeyboardMarkup(row_width=1)
         inline_keyboard.add(
             InlineKeyboardButton(
-                text=f"{SpecialSymbol.ATTENTION} subscribe to all triggers {SpecialSymbol.ATTENTION}",
+                text=_("{} subscribe to all triggers {}", language_code).format(
+                    SpecialSymbol.ATTENTION, SpecialSymbol.ATTENTION
+                ),
                 callback_data=str(
                     TelegramButtonData(
                         action=TelegramButtonAction.SUBSCRIBE_MONITORING_SYSTEM,
@@ -171,16 +181,22 @@ class TelegramKeyboardCreator:
                 ),
             )
         )
-        inline_keyboard.add(self._create_back_to_subscription_settings_button(start_message_id))
-        inline_keyboard.add(self._create_finish_button(start_message_id))
+        inline_keyboard.add(self._create_back_to_subscription_settings_button(language_code, start_message_id))
+        inline_keyboard.add(self._create_finish_button(language_code, start_message_id))
         return inline_keyboard
 
-    def create_full_unsubscription_keyboard(self, start_message_id: Optional[int] = None) -> InlineKeyboardMarkup:
+    def create_full_unsubscription_keyboard(
+            self,
+            language_code: LanguageCode,
+            start_message_id: Optional[int] = None,
+    ) -> InlineKeyboardMarkup:
         """Create all triggers unsubscription keyboard."""
         inline_keyboard = InlineKeyboardMarkup(row_width=1)
         inline_keyboard.add(
             InlineKeyboardButton(
-                text=f"{SpecialSymbol.ATTENTION} unsubscribe from all triggers {SpecialSymbol.ATTENTION}",
+                text=_("{} unsubscribe from all triggers {}", language_code).format(
+                    SpecialSymbol.ATTENTION, SpecialSymbol.ATTENTION
+                ),
                 callback_data=str(
                     TelegramButtonData(
                         action=TelegramButtonAction.UNSUBSCRIBE_MONITORING_SYSTEM,
@@ -189,11 +205,15 @@ class TelegramKeyboardCreator:
                 ),
             )
         )
-        inline_keyboard.add(self._create_back_to_subscription_settings_button(start_message_id))
-        inline_keyboard.add(self._create_finish_button(start_message_id))
+        inline_keyboard.add(self._create_back_to_subscription_settings_button(language_code, start_message_id))
+        inline_keyboard.add(self._create_finish_button(language_code, start_message_id))
         return inline_keyboard
 
-    async def create_host_groups_keyboard(self, start_message_id: Optional[int] = None) -> InlineKeyboardMarkup:
+    async def create_host_groups_keyboard(
+            self,
+            language_code: LanguageCode,
+            start_message_id: Optional[int] = None,
+    ) -> InlineKeyboardMarkup:
         """Create host groups subscription keyboard."""
         host_groups = await self.context.database_gateway.select(HostGroup)
         inline_keyboard = InlineKeyboardMarkup(row_width=2)
@@ -212,7 +232,7 @@ class TelegramKeyboardCreator:
             )
         inline_keyboard.add(
             InlineKeyboardButton(
-                text=f"{SpecialSymbol.BACK} Back to monitoring systems",
+                text=_("{} Back to monitoring systems", language_code).format(SpecialSymbol.BACK),
                 callback_data=str(
                     TelegramButtonData(
                         action=TelegramButtonAction.GO_TO_MONITORING_SYSTEMS,
@@ -221,13 +241,14 @@ class TelegramKeyboardCreator:
                 ),
             )
         )
-        inline_keyboard.add(self._create_finish_button(start_message_id))
+        inline_keyboard.add(self._create_finish_button(language_code, start_message_id))
         return inline_keyboard
 
     async def create_hosts_keyboard(
             self,
             host_group_id: int,
             page_number: int,
+            language_code: LanguageCode,
             start_message_id: Optional[int] = None,
     ) -> InlineKeyboardMarkup:
         """Create hosts subscription keyboard."""
@@ -281,7 +302,7 @@ class TelegramKeyboardCreator:
         )
         inline_keyboard.add(
             InlineKeyboardButton(
-                text=f"{SpecialSymbol.BACK} Back to host groups",
+                text=_("{} Back to host groups", language_code).format(SpecialSymbol.BACK),
                 callback_data=str(
                     TelegramButtonData(
                         action=TelegramButtonAction.GO_TO_HOST_GROUPS,
@@ -290,7 +311,7 @@ class TelegramKeyboardCreator:
                 ),
             )
         )
-        inline_keyboard.add(self._create_finish_button(start_message_id))
+        inline_keyboard.add(self._create_finish_button(language_code, start_message_id))
         return inline_keyboard
 
     async def create_triggers_keyboard(
@@ -352,7 +373,7 @@ class TelegramKeyboardCreator:
         host_groups = await self.context.database_gateway.get_host_groups_by_host_id(host_id)
         inline_keyboard.add(
             InlineKeyboardButton(
-                text=f"{SpecialSymbol.BACK} Back to hosts",
+                text=_("{} Back to hosts", notification_sink.language_code).format(SpecialSymbol.BACK),
                 callback_data=str(
                     TelegramButtonData(
                         action=TelegramButtonAction.GO_TO_HOSTS,
@@ -362,11 +383,12 @@ class TelegramKeyboardCreator:
                 ),
             )
         )
-        inline_keyboard.add(self._create_finish_button(start_message_id))
+        inline_keyboard.add(self._create_finish_button(notification_sink.language_code, start_message_id))
         return inline_keyboard
 
     async def create_time_zones_keyboard(
             self,
+            language_code: LanguageCode,
             page_number: int = 0,
             start_message_id: Optional[int] = None,
     ) -> InlineKeyboardMarkup:
@@ -416,15 +438,63 @@ class TelegramKeyboardCreator:
             )
         )
         if start_message_id is None:
-            inline_keyboard.add(self._create_finish_button(start_message_id))
+            inline_keyboard.add(self._create_finish_button(language_code, start_message_id))
             return inline_keyboard
 
         inline_keyboard.add(
             InlineKeyboardButton(
-                text="next setting",
+                text=_("next setting", language_code),
                 callback_data=str(
                     TelegramButtonData(
                         action=TelegramButtonAction.GO_TO_MONITORING_SYSTEMS,
+                        start_message_id=start_message_id,
+                    )
+                ),
+            )
+        )
+        return inline_keyboard
+
+    async def create_languages_keyboard(
+            self,
+            language_code: LanguageCode,
+            start_message_id: Optional[int] = None,
+    ) -> InlineKeyboardMarkup:
+        """Create language change keyboard."""
+        inline_keyboard = InlineKeyboardMarkup(resize_keyboard=True)
+        inline_keyboard.add(
+            InlineKeyboardButton(
+                text=f"{LanguageTitle.EN}",
+                callback_data=str(
+                    TelegramButtonData(
+                        action=TelegramButtonAction.SET_LANGUAGE,
+                        entity_id=LanguageCode.EN,
+                        start_message_id=start_message_id,
+                    )
+                ),
+            )
+        )
+        inline_keyboard.add(
+            InlineKeyboardButton(
+                text=f"{LanguageTitle.RU}",
+                callback_data=str(
+                    TelegramButtonData(
+                        action=TelegramButtonAction.SET_LANGUAGE,
+                        entity_id=LanguageCode.RU,
+                        start_message_id=start_message_id,
+                    )
+                ),
+            )
+        )
+        if start_message_id is None:
+            inline_keyboard.add(self._create_finish_button(language_code, start_message_id))
+            return inline_keyboard
+
+        inline_keyboard.add(
+            InlineKeyboardButton(
+                text=_("next setting", language_code),
+                callback_data=str(
+                    TelegramButtonData(
+                        action=TelegramButtonAction.GO_TO_TIME_ZONES,
                         start_message_id=start_message_id,
                     )
                 ),
@@ -504,10 +574,13 @@ class TelegramKeyboardCreator:
         )
 
     @staticmethod
-    def _create_finish_button(start_message_id: Optional[int] = None) -> InlineKeyboardButton:
+    def _create_finish_button(
+            language_code: LanguageCode,
+            start_message_id: Optional[int] = None,
+    ) -> InlineKeyboardButton:
         """Create finish button."""
         return InlineKeyboardButton(
-            text=f"{SpecialSymbol.FINISH} Finish {SpecialSymbol.FINISH}",
+            text=_("{} Finish {}", language_code).format(SpecialSymbol.FINISH, SpecialSymbol.FINISH),
             callback_data=str(
                 TelegramButtonData(action=TelegramButtonAction.FINISH_SETTING, start_message_id=start_message_id)
             ),
@@ -524,10 +597,13 @@ class TelegramKeyboardCreator:
         )
 
     @staticmethod
-    def _create_back_to_subscription_settings_button(start_message_id: Optional[int] = None) -> InlineKeyboardButton:
+    def _create_back_to_subscription_settings_button(
+            language_code: LanguageCode,
+            start_message_id: Optional[int] = None,
+    ) -> InlineKeyboardButton:
         """Create return button."""
         return InlineKeyboardButton(
-            text=f"{SpecialSymbol.BACK} Back to subscription settings",
+            text=_("{} Back to subscription settings", language_code).format(SpecialSymbol.BACK),
             callback_data=str(
                 TelegramButtonData(
                     action=TelegramButtonAction.GO_TO_MONITORING_SYSTEMS,

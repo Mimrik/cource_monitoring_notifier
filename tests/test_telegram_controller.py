@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, AsyncMock
 
 from entities.time_zone import TimeZone
 from notifiers.telegram.telegram_controller import TelegramController
+from utils.translation import LanguageCode
 
 
 class TestTelegramController(IsolatedAsyncioTestCase):
@@ -41,8 +42,12 @@ class TestTelegramController(IsolatedAsyncioTestCase):
                 return_value=4224
             )
             self.telegram_controller.context.telegram_bot.send_message = AsyncMock()
+            self.telegram_controller.context.database_gateway.get_notification_sink = AsyncMock(
+                return_value=MagicMock(language_code=LanguageCode.EN)
+            )
 
             await self.telegram_controller._subscribe_to_monitoring_system(callback_query)
 
             self.telegram_controller.context.controller.subscribe_to_monitoring_system_triggers.assert_awaited_once()
             self.telegram_controller.context.telegram_bot.send_message.assert_awaited_once()
+            self.telegram_controller.context.database_gateway.get_notification_sink.assert_awaited_once()

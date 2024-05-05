@@ -6,7 +6,7 @@ from sqlalchemy_tools.entity_helpers.sqlalchemy_base import sqlalchemy_mapper_re
 
 from entities.time_zone import TimeZone, time_zone_code_to_time_zone_id
 from utils.timestamp_converters import get_current_time_sec, CURRENT_TIMESTAMP_SEC_SQL_CLAUSE
-
+from utils.translation import LanguageCode
 
 DEFAULT_TIME_ZONE_ID = text(f"{time_zone_code_to_time_zone_id['Etc/GMT']}")
 
@@ -24,6 +24,7 @@ class NotificationSink:
         default=DEFAULT_TIME_ZONE_ID,
         server_default=DEFAULT_TIME_ZONE_ID,
     )
+    language_code: Mapped[str] = mapped_column(nullable=False, default=LanguageCode.EN)
 
     created_at: Mapped[int] = mapped_column(
         default_factory=get_current_time_sec,

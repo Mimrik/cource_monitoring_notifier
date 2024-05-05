@@ -2,7 +2,7 @@
 name = "cource-moniroring-notifier"
 version = "0.1.0"
 description = ""
-authors = ["Mimrik <misha@mamrov.ru>"]
+authors = ["Mimrik <misha@mamrov.ru>", "fraundist <fraundist@gmail.com>"]
 readme = "README.md"
 source = [
     {name = "PyPI", priority = "default"},
@@ -22,6 +22,7 @@ coverage = "^7.5.0"
 [tool.poetry.group.dev.dependencies]
 flake8 = "^7.0.0"
 pydocstyle = "^6.3.0"
+babel = "^2.14.0"
 
 [build-system]
 requires = ["poetry-core"]
