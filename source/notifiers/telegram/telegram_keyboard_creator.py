@@ -1,7 +1,7 @@
 """TelegramKeyboardCreator module."""
 import logging
 from dataclasses import dataclass
-from enum import Enum, unique, StrEnum
+from enum import unique, StrEnum
 from math import ceil
 from typing import Optional
 
