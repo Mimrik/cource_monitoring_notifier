@@ -1,0 +1,271 @@
+# Russian (Russia) translations for PROJECT.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-05-05 14:03+0300\n"
+"PO-Revision-Date: 2024-05-05 11:53+0300\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ru_RU\n"
+"Language-Team: ru_RU <LL@li.org>\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.14.0\n"
+
+#: source/notifiers/telegram/telegram_controller.py:158
+msgid "I'm already working in this chat"
+msgstr "Я уже работаю в этом чате"
+
+#: source/notifiers/telegram/telegram_controller.py:200
+msgid ""
+"Emoji to problem severity:\n"
+"ℹ - info\n"
+"😐 - warning\n"
+"🔥 - average\n"
+"👹 - high\n"
+"💀 - disaster\n"
+"✅ - problem resolved.\n"
+"\n"
+"Commands:\n"
+"/{} - detailed dashboard analogue\n"
+"/{} - subscription settings\n"
+"/{} - time zone setting\n"
+"/{} - language setting\n"
+msgstr ""
+"Соответствие эмоджи приоритету события:\n"
+"ℹ - информационное\n"
+"😐 - предупреждение\n"
+"🔥 - средний приоритет\n"
+"👹 - высокий приоритет\n"
+"💀 - наивысший приоритет\n"
+"✅ - событие решено.\n"
+"\n"
+"Доступные команды:\n"
+"/{} - аналог дашборда\n"
+"/{} - настройки подписок\n"
+"/{} - настройки часового пояса\n"
+"/{} - настройки языка\n"
+
+#: source/notifiers/telegram/telegram_controller.py:242
+#: source/notifiers/telegram/telegram_controller.py:432
+msgid "Subscription settings"
+msgstr "Настройки подписки"
+
+#: source/notifiers/telegram/telegram_controller.py:313
+msgid ""
+"{} Monitoring system: Zabbix\n"
+"\n"
+"Available host groups:"
+msgstr ""
+"{} Система мониторинга: Zabbix\n"
+"\n"
+"Доступные группы хостов:"
+
+#: source/notifiers/telegram/telegram_controller.py:332
+msgid ""
+"{} Monitoring system: Zabbix\n"
+"{} Host group: {}\n"
+"\n"
+"Available hosts:"
+msgstr ""
+"{} Система мониторинга: Zabbix\n"
+"{} Группа хоста: {}\n"
+"\n"
+"Доступные группы хостов:"
+
+#: source/notifiers/telegram/telegram_controller.py:356
+msgid ""
+"{} Monitoring system: Zabbix\n"
+"{} Host group: {}\n"
+"{} Host: {}\n"
+"\n"
+"Available triggers:"
+msgstr ""
+"{} Система мониторинга: Zabbix\n"
+"{} Группа хоста: {}\n"
+"{} Хост: {}\n"
+"\n"
+"Доступные группы хоста:"
+
+#: source/notifiers/telegram/telegram_controller.py:456
+msgid "no problems"
+msgstr "Событий нет"
+
+#: source/notifiers/telegram/telegram_controller.py:457
+msgid ""
+"Current problems:\n"
+"\n"
+msgstr ""
+"Текущие события:\n"
+"\n"
+
+#: source/notifiers/telegram/telegram_controller.py:619
+msgid "subscribed to {} Zabbix triggers"
+msgstr "Оформлена подписка на {} триггеры Zabbix"
+
+#: source/notifiers/telegram/telegram_controller.py:629
+msgid "unsubscribed from all Zabbix triggers"
+msgstr "Отменена подписка на все триггеры Zabbix"
+
+#: source/notifiers/telegram/telegram_keyboard_creator.py:129
+msgid "manage subscriptions"
+msgstr "управление подписками"
+
+#: source/notifiers/telegram/telegram_keyboard_creator.py:140
+msgid "subscribe to all triggers"
+msgstr "подписаться на все триггеры"
+
+#: source/notifiers/telegram/telegram_keyboard_creator.py:151
+msgid "unsubscribe from all triggers"
+msgstr "отписаться от всех триггеров"
+
+#: source/notifiers/telegram/telegram_keyboard_creator.py:173
+msgid "{} subscribe to all triggers {}"
+msgstr "{} подписаться на все триггеры {}"
+
+#: source/notifiers/telegram/telegram_keyboard_creator.py:197
+msgid "{} unsubscribe from all triggers {}"
+msgstr "{} отписаться от всех триггеров {}"
+
+#: source/notifiers/telegram/telegram_keyboard_creator.py:235
+msgid "{} Back to monitoring systems"
+msgstr "{} возврат к системе мониторинга"
+
+#: source/notifiers/telegram/telegram_keyboard_creator.py:305
+msgid "{} Back to host groups"
+msgstr "{} Возврат к группам хоста"
+
+#: source/notifiers/telegram/telegram_keyboard_creator.py:376
+msgid "{} Back to hosts"
+msgstr "{} Возврат к хостам"
+
+#: source/notifiers/telegram/telegram_keyboard_creator.py:446
+#: source/notifiers/telegram/telegram_keyboard_creator.py:494
+msgid "next setting"
+msgstr "следующая настройка"
+
+#: source/notifiers/telegram/telegram_keyboard_creator.py:583
+msgid "{} Finish {}"
+msgstr "{} Завершить {}"
+
+#: source/notifiers/telegram/telegram_keyboard_creator.py:606
+msgid "{} Back to subscription settings"
+msgstr "{} Возврат к настройкам подписки"
+
+#: source/notifiers/telegram/telegram_renderer.py:72
+msgid "{} Description: {}\n"
+msgstr "{} Описание: {}\n"
+
+#: source/notifiers/telegram/telegram_renderer.py:82
+msgid ""
+"Are you sure that you want to subscribe to all {} triggers? The number of"
+" triggers is too large for the average user"
+msgstr ""
+"Вы уверены что хотите подписаться на все {} триггеры? Количество "
+"триггеров слишком большое для обычного пользователя"
+
+#: source/notifiers/telegram/telegram_renderer.py:91
+msgid ""
+"Are you sure that you want to unsubscribe from all {} triggers? This "
+"action will reset all your subscriptions in this monitoring system"
+msgstr ""
+"Вы уверены что хотите отписаться от всех {} триггеров? Это действие "
+"сбросит все ваши подписки в мониторинговой системе"
+
+#: source/notifiers/telegram/telegram_renderer.py:106
+msgid "{} Source:\n"
+msgstr "{} Источник:\n"
+
+#: source/notifiers/telegram/telegram_renderer.py:108
+msgid "{} Monitoring system: {}\n"
+msgstr "{} Система мониторинга: {}\n"
+
+#: source/notifiers/telegram/telegram_renderer.py:109
+msgid "{} Host groups: {)}\n"
+msgstr "{} Группы хостов: {)}\n"
+
+#: source/notifiers/telegram/telegram_renderer.py:110
+msgid "{} Host: {}\n"
+msgstr "{} Хост: {}\n"
+
+#: source/notifiers/telegram/telegram_renderer.py:111
+msgid "{} Trigger: {}"
+msgstr "{} Триггер: {}"
+
+#: source/notifiers/telegram/telegram_renderer.py:116
+msgid "{} event {}"
+msgstr "{} событие {}"
+
+#: source/notifiers/telegram/telegram_renderer.py:123
+msgid "{} Occurred at {}"
+msgstr "{} Возникло в  {}"
+
+#: source/notifiers/telegram/telegram_renderer.py:132
+msgid "✅ Event {} resolved at {} (in {})"
+msgstr "✅ Событие {} решено в {} (за {})"
+
+#: source/notifiers/telegram/telegram_renderer.py:148
+msgid ""
+"Greetings!\n"
+"I will send you monitoring events.\n"
+"\n"
+"Before we begin, let's make initial settings:\n"
+msgstr ""
+"Приветствую!\n"
+"Я буду отправлять Вам оповещения о событиях мониторинга.\n"
+"\n"
+"Перед началом необходимо совершить начальную настройку:\n"
+
+#: source/notifiers/telegram/telegram_renderer.py:165
+msgid "{} Promote me to admin\n"
+msgstr "{} Дать мне права админа\n"
+
+#: source/notifiers/telegram/telegram_renderer.py:166
+msgid ""
+"{} Choose language\n"
+"(you'll be able to change it by /language command)\n"
+msgstr ""
+"{} Установить язык\n"
+"(Вы сможете изменить язык позже командой /language)\n"
+
+#: source/notifiers/telegram/telegram_renderer.py:171
+msgid ""
+"{} Set up time zone\n"
+"(you'll be able to change it by /timezone command)\n"
+msgstr ""
+"{} Установить часовой пояс\n"
+"(Вы сможете изменить пояс командой /timezone)\n"
+
+#: source/notifiers/telegram/telegram_renderer.py:176
+msgid ""
+"{} Set up trigger subscriptions\n"
+"(you'll be able to change it by /subscription command)\n"
+msgstr ""
+"{} Подписаться на триггеры\n"
+"(Вы сможете изменить подписку командой /subscription)\n"
+
+#: source/notifiers/telegram/telegram_renderer.py:183
+msgid ""
+"\n"
+"Initial settings are complete!\n"
+"For functional description you can use /help command"
+msgstr ""
+"\n"
+"Начальная настройка завершена!\n"
+"Для вызова функциональной справки используйте команду /help"
+
+#: source/notifiers/telegram/telegram_renderer.py:192
+msgid "Your current time zone is {}"
+msgstr "Ваш текущий часовой пояс {}"
+
+#: source/notifiers/telegram/telegram_renderer.py:197
+msgid "Your current language is {}"
+msgstr "Ваш текущий язык {}"
+
