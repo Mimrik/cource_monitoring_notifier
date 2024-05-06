@@ -613,7 +613,9 @@ class TelegramController(AbstractNotifierController, AsyncInitable):
         await self.context.telegram_bot.edit_message_text(
             chat_id=callback_query.message.chat.id,
             message_id=callback_query.message.message_id,
-            text=self.context.telegram_renderer.render_unsubscription_clarifying_question("Zabbix"),
+            text=self.context.telegram_renderer.render_unsubscription_clarifying_question(
+                "Zabbix", notification_sink.language_code
+            ),
             reply_markup=self.context.telegram_keyboard_creator.create_full_unsubscription_keyboard(
                 notification_sink.language_code, start_message_id=button_data.start_message_id,
             )

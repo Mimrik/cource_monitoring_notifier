@@ -106,7 +106,7 @@ class TelegramRenderer:
         result = _("{} Source:\n", language_code).format(SpecialSymbol.SECTION)
         prefix = f"{SUBSECTION_INDENT}{SpecialSymbol.SUBSECTION}"
         result += _("{} Monitoring system: {}\n", language_code).format(prefix, monitoring_system_title)
-        result += _("{} Host groups: {)}\n", language_code).format(prefix, HOST_GROUP_COMBINER.join(host_group_titles))
+        result += _("{} Host groups: {}\n", language_code).format(prefix, HOST_GROUP_COMBINER.join(host_group_titles))
         result += _("{} Host: {}\n", language_code).format(prefix, host_title)
         result += _("{} Trigger: {}", language_code).format(prefix, trigger_title)
         return result
