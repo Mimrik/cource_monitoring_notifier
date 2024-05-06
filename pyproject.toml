@@ -1,9 +1,16 @@
-[tool.poetry]
+[project]
 name = "cource-moniroring-notifier"
 version = "0.1.0"
 description = ""
-authors = ["Mimrik <misha@mamrov.ru>", "fraundist <fraundist@gmail.com>", "pldmval <pdmitry05@yandex.ru>"]
+authors = [
+    {name = "Mimrik"},
+    {name = "fraundist"},
+    {name = "pldmval"}
+]
 readme = "README.md"
+dynamic = ["dependencies"]
+
+[tool.poetry]
 source = [
     {name = "PyPI", priority = "default"},
     {name = "abm_pypi", url = "https://pypi2.abm-jsc.ru", priority = "primary"},
@@ -25,7 +32,15 @@ flake8 = "^7.0.0"
 pydocstyle = "^6.3.0"
 babel = "^2.14.0"
 doit = "^0.36.0"
+wheel = "^0.43.0"
+build = "^1.2.1"
+
+[tool.setuptools.dynamic]
+dependencies = { file = "requirements.txt" }
+
+[tool.setuptools]
+py-modules = []
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["Sphinx", "setuptools", "build", "doit", "pydocstyle", "wheel"]
+build-backend = "setuptools.build_meta"

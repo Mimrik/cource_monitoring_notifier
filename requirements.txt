@@ -1,0 +1,9 @@
+aiogram==2.15
+pytz==2024.1
+
+urllib3 @ https://github.com/urllib3/urllib3/archive/refs/tags/1.26.8.zip
+
+init-helpers-abm @ https://pypi2.abm-jsc.ru/simple/init-helpers-abm/#:~:text=init_helpers_abm%2D1.2.59931%2Dpy3%2Dnone%2Dany.whl
+async-tools-abm @ https://pypi2.abm-jsc.ru
+sqlalchemy-tools-abm @ https://pypi2.abm-jsc.ru
+http-tools-abm @ https://pypi2.abm-jsc.ru
