@@ -24,6 +24,7 @@ sphinx = "^7.3.7"
 flake8 = "^7.0.0"
 pydocstyle = "^6.3.0"
 babel = "^2.14.0"
+doit = "^0.36.0"
 
 [build-system]
 requires = ["poetry-core"]
