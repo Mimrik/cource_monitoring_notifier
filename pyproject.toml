@@ -14,11 +14,7 @@ dynamic = ["dependencies"]
 name = "cource-moniroring-notifier"
 version = "0.1.0"
 description = ""
-authors = [
-    {name = "Mimrik"},
-    {name = "fraundist"},
-    {name = "pldmval"}
-]
+authors = ["Mimrik <misha@mamrov.ru>", "fraundist <fraundist@gmail.com>", "pldmval <pdmitry05@yandex.ru>"]
 readme = "README.md"
 source = [
     {name = "PyPI", priority = "default"},
