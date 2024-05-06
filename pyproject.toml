@@ -1,14 +1,3 @@
-[tool.poetry]
-name = "cource-moniroring-notifier"
-version = "0.1.0"
-description = ""
-authors = [
-    {name = "Mimrik"},
-    {name = "fraundist"},
-    {name = "pldmval"}
-]
-readme = "README.md"
-
 [project]
 name = "cource-moniroring-notifier"
 version = "0.1.0"
@@ -22,6 +11,15 @@ readme = "README.md"
 dynamic = ["dependencies"]
 
 [tool.poetry]
+name = "cource-moniroring-notifier"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Mimrik"},
+    {name = "fraundist"},
+    {name = "pldmval"}
+]
+readme = "README.md"
 source = [
     {name = "PyPI", priority = "default"},
     {name = "abm_pypi", url = "https://pypi2.abm-jsc.ru", priority = "primary"},
