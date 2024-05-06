@@ -1,3 +1,14 @@
+[tool.poetry]
+name = "cource-moniroring-notifier"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Mimrik"},
+    {name = "fraundist"},
+    {name = "pldmval"}
+]
+readme = "README.md"
+
 [project]
 name = "cource-moniroring-notifier"
 version = "0.1.0"
