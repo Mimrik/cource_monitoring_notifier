@@ -54,3 +54,15 @@ def task_check():
             "actions": [],
             "task_dep": ["code_style", "docstyle", "tests"]
     }
+
+
+def task_prepare():
+    """Perform all checks."""
+    return {
+            "actions": [
+                "poetry install",
+                "pybabel compile -D course_monitoring_notifier -l ru_RU.UTF-8 -d translations -i "
+                ".\\translations\\ru_RU.UTF-8\\LC_MESSAGES\\course_monitoring_notifier.po"
+                ""
+            ],
+    }
