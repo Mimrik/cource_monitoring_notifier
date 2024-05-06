@@ -1,5 +1,9 @@
+import os
+import sys
 from unittest import IsolatedAsyncioTestCase
 from unittest.mock import MagicMock, AsyncMock
+
+sys.path.insert(0, os.path.abspath(os.path.join(__file__, "..", "..", "source")))
 
 from outer_resources.zabbix_connector import ZabbixConnector, ZabbixProblem
 
