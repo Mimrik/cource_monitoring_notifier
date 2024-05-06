@@ -188,8 +188,8 @@ msgid "{} Monitoring system: {}\n"
 msgstr "{} Система мониторинга: {}\n"
 
 #: source/notifiers/telegram/telegram_renderer.py:109
-msgid "{} Host groups: {)}\n"
-msgstr "{} Группы хостов: {)}\n"
+msgid "{} Host groups: {}\n"
+msgstr "{} Группы хостов: {}\n"
 
 #: source/notifiers/telegram/telegram_renderer.py:110
 msgid "{} Host: {}\n"
